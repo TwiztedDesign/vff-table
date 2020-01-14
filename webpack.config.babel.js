@@ -1,12 +1,12 @@
 import {join} from 'path';
-const WebpackShellPlugin = require('webpack-shell-plugin');
+
 
 const include = join(__dirname, 'src');
 
 module.exports =  {
     entry               : './src/index.js',
     output              : {
-        filename        : "vff-ext.js",
+        filename        : "vff-table.js",
         path            : join(__dirname, 'dist')
 
     },
@@ -52,10 +52,5 @@ module.exports =  {
                 include
             }
         ]
-    },
-    plugins : [
-        new WebpackShellPlugin({
-            onBuildExit: 'node webpack.after.js'
-        })
-    ]
+    }
 };
