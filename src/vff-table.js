@@ -1,4 +1,4 @@
-export default class VffTitle extends HTMLElement {
+export default class VffTable extends HTMLElement {
     constructor() {
         super();
     }
@@ -24,5 +24,5 @@ export default class VffTitle extends HTMLElement {
     }
 }
 
-window.vff.define("vff-title", VffTitle);
+window.vff.define("vff-table", VffTable);
 
