@@ -4,7 +4,7 @@ import {join} from 'path';
 const include = join(__dirname, 'src');
 
 module.exports =  {
-    entry               : './src/index.js',
+    entry               : './src/vff-table.js',
     output              : {
         filename        : "vff-table.js",
         path            : join(__dirname, 'dist')
