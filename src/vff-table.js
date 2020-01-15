@@ -78,13 +78,15 @@ export default class VffTable extends HTMLElement {
 
     render() {
         const header = this.renderHeader() || '';
+        const subHeader = this.renderSubHeader() || '';
+        const body = this.renderBody() || '';
         const footer = this.renderFooter() || '';
 
         this.innerHTML = `
             <div class="vff-table">
                 ${header}
-                ${this.renderSubHeader()}
-                ${this.renderBody()}
+                ${subHeader}
+                ${body}
                 ${footer}
             </div>
         `;
@@ -98,7 +100,9 @@ export default class VffTable extends HTMLElement {
     }
 
     renderSubHeader() {
-        const amountOfColumns = this._subHeader.length;
+        const amountOfColumns = this._subHeader && this._subHeader.length;
+        if (!amountOfColumns) return null;
+
         const cols = [];
 
         for (let i = 0; i < amountOfColumns; i++) {
@@ -117,7 +121,9 @@ export default class VffTable extends HTMLElement {
     }
 
     renderBody() {
-        const amountOfRows = this._tableBody.length;
+        const amountOfRows = this._tableBody && this._tableBody.length;
+        if (!amountOfRows) return null;
+
         const rows = [];
 
         for (let i = 0; i < amountOfRows; i++) {
