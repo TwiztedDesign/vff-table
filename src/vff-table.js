@@ -1,88 +1,157 @@
+import tableData from '../mocks/table_data';
+import titles from '../mocks/sub_header';
+
 export default class VffTable extends HTMLElement {
     constructor() {
         super();
-        this._rows = 3;
-        this._cols = 3;
-        this._header = '';
+
+        this._header = 'Header Content';
+        this._subHeader = titles;
+        this._tableBody = tableData.body; // array of arrays
+        this._footer = 'Footer Content';
     }
+
+    /*****************************************
+     * Get / Set
+     *****************************************/
+
+    get header() {
+        return this._header;
+    }
+
+    /**
+     * @param {string} text
+     */
+    set header(text) {
+        if (!text) return;
+        this._header = text;
+        this.render();
+    }
+
+    /**
+     * @param data
+     * @param {col:number} data.column
+     * @param {*} data.value
+     */
+    set subHeaderCell(data) {
+        if (!data) return;
+        this._subHeader[data.column].data = data.value;
+        this.render();
+    }
+
+    /**
+     * @param data
+     * @param {{row:number, col:number}} data.coordinates
+     * @param {*} data.value
+     */
+    set tableCell(data) {
+        if (!data) return;
+        this._tableBody[data.coordinates.row][data.coordinates.col].data = data.value;
+        this.render();
+    }
+
+    get footer() {
+        return this._footer;
+    }
+
+    /**
+     * @param {string} text
+     */
+    set footer(text) {
+        this._footer = text;
+        this.render();
+    }
+
+    /*****************************************
+     * Life Cycle methods
+     *****************************************/
 
     connectedCallback() {
         this.render();
     }
 
-
     disconnectedCallback() {
-
     }
 
-    render(){
+    /*****************************************
+     * render methods
+     *****************************************/
 
-        let html = `
+    render() {
+        this.innerHTML = `
             <div class="vff-table">
-                <div class="vff-table-header">Header</div>
-                <div class="vff-table-sub-header">
-                    <div class="vff-table-row header">
-                        <div class="vff-table-col">COL1</div>
-                        <div class="vff-table-col">COL2</div>
-                    </div>
-                </div>
-                <div class="vff-table-body">
-                    <div class="vff-table-row">
-                        <div class="vff-table-col">r1c1</div>
-                        <div class="vff-table-col">r1c2</div>
-                    </div>
-                    <div class="vff-table-row">
-                        <div class="vff-table-col">r2c1</div>
-                        <div class="vff-table-col">r2c2</div>
-                    </div>
-                </div>
-                <div class="vff-table-footer">Footer</div>
+                ${this.renderHeader()}
+                ${this.renderSubHeader()}
+                ${this.renderBody()}
+                ${this.renderFooter()}
             </div>
         `;
-
-        this.innerHTML = html;
     }
 
-    get header(){
-        return this._header;
-    }
-    set header(text){
-        this._header = text;
-        this.querySelector('.vff-table-header').innerHTML = this._header;
+    renderHeader() {
+        return (
+            `<div class="vff-table__header">${this._header}</div>`
+        );
     }
 
+    renderSubHeader() {
+        const amountOfColumns = this._subHeader.length;
+        const cols = [];
 
+        for (let i = 0; i < amountOfColumns; i++) {
+            const data = this._subHeader[i].data;
+            const col = `<div class="vff-table__col">${data}</div>`;
+            cols.push(col);
+        }
 
-    get rows(){
-        return this._rows;
+        return (
+            `<div class="vff-table__sub-header">
+                    <div class="vff-table__row">
+                        ${cols.join('')}
+                    </div>
+                </div>`
+        );
     }
-    set rows(n){
-        this._rows = n;
-        console.log('rows:',n);
-        //TODO manipulate DOM
+
+    renderBody() {
+        const amountOfRows = this._tableBody.length;
+        const rows = [];
+
+        for (let i = 0; i < amountOfRows; i++) {
+            const amountOfColumns = this._tableBody[i].length;
+            const cols = [];
+
+            for (let j = 0; j < amountOfColumns; j++) {
+                let columnContent = this._tableBody[i][j].data;
+                let col = `<div data-col=${j} class="vff-table__col">${columnContent}</div>`;
+
+                cols.push(col);
+            }
+
+            rows.push(`<div data-row=${i} class="vff-table__row">${cols.join('')}</div>`);
+        }
+
+        return (
+            `<div class="vff-table__body">${rows.join('')}</div>`
+        );
     }
 
-    get columns(){
-        return this._cols;
-    }
-    set columns(n){
-        this._cols = n;
-        console.log('cols:',n);
-        //TODO manipulate DOM
+    renderFooter() {
+        return (
+            `<div class="vff-table__footer">${this._footer}</div>`
+        );
     }
 
-    // get text() {
-    //     return this.getAttribute("text");
-    // }
-    // set text(value) {
-    //     this.render(value);
-    // }
+    /*****************************************
+     * VFF related
+     *****************************************/
 
-    expose(){
+    expose() {
         return {
-            rows : 'rows',
-            columns : 'columns',
-            header : 'header'
+            header: 'header',
+            subHeaderCell: 'subHeaderCell',
+            tableCell: 'tableCell',
+            footer: 'footer'
         };
     }
 

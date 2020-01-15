@@ -1,0 +1,36 @@
+body {
+    color: black;
+}
+
+.vff-table {
+    border: 1px solid;
+}
+
+.vff-table__header {
+    border-bottom: 1px solid;
+}
+
+.vff-table__sub-header {
+    border-bottom: 1px solid;
+}
+
+.vff-table__body {
+    display: flex;
+    flex-direction: column;
+}
+
+.vff-table__row {
+    display: flex;
+}
+
+.vff-table__row:not(:last-child) {
+    border-bottom: 1px solid;
+}
+
+.vff-table__col {
+    width: 33.3%;
+}
+
+.vff-table__footer {
+    border-top: 1px solid;
+}
