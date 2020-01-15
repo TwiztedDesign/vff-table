@@ -123,12 +123,12 @@ export default class VffTable extends HTMLElement {
 
             for (let j = 0; j < amountOfColumns; j++) {
                 let columnContent = this._tableBody[i][j].data;
-                let col = `<div data-col=${j} class="vff-table__col">${columnContent}</div>`;
+                let col = `<div class="vff-table__col">${columnContent}</div>`;
 
                 cols.push(col);
             }
 
-            rows.push(`<div data-row=${i} class="vff-table__row">${cols.join('')}</div>`);
+            rows.push(`<div class="vff-table__row">${cols.join('')}</div>`);
         }
 
         return (
