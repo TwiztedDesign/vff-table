@@ -164,7 +164,6 @@ export default class VffTable extends HTMLElement {
             footer: 'footer'
         };
     }
-
 }
 
 window.vff.define("vff-table", VffTable);
