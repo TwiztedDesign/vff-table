@@ -23,7 +23,6 @@ export default class VffTable extends HTMLElement {
      * @param {string} text
      */
     set header(text) {
-        if (!text) return;
         this._header = text;
         this.render();
     }
@@ -78,17 +77,21 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     render() {
+        const header = this.renderHeader() || '';
+        const footer = this.renderFooter() || '';
+
         this.innerHTML = `
             <div class="vff-table">
-                ${this.renderHeader()}
+                ${header}
                 ${this.renderSubHeader()}
                 ${this.renderBody()}
-                ${this.renderFooter()}
+                ${footer}
             </div>
         `;
     }
 
     renderHeader() {
+        if (!this._header) return null;
         return (
             `<div class="vff-table__header">${this._header}</div>`
         );
@@ -137,6 +140,7 @@ export default class VffTable extends HTMLElement {
     }
 
     renderFooter() {
+        if (!this._footer) return null;
         return (
             `<div class="vff-table__footer">${this._footer}</div>`
         );
