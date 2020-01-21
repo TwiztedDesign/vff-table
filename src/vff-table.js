@@ -1,14 +1,28 @@
 import tableData from '../mocks/table_data';
 import titles from '../mocks/sub_header';
+import VffRow from "./components/vff-row";
 
 export default class VffTable extends HTMLElement {
     constructor() {
         super();
-
-        this._header = 'Header Content';
-        this._subHeader = titles;
-        this._tableBody = tableData.body; // array of arrays
-        this._footer = 'Footer Content';
+        this.attachShadow({mode: 'open'});
+        this._header = null;
+        this._subHeader = null;
+        this._tableBody = null;
+        this._footer = null;
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host(*) {
+                    box-sizing: border-box;
+                }
+            </style>
+            <div class="vff-table">
+                <div id="table-header"></div>
+                <div id="table-sub-header"></div>
+                <div id="table-body"></div>
+                <div id="table-footer"></div>
+            </div>
+        `;
     }
 
     /*****************************************
@@ -16,7 +30,7 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     get header() {
-        return this._header;
+        return this._header || '';
     }
 
     /**
@@ -24,7 +38,6 @@ export default class VffTable extends HTMLElement {
      */
     set header(text) {
         this._header = text;
-        this.render();
     }
 
     /**
@@ -35,7 +48,6 @@ export default class VffTable extends HTMLElement {
     set subHeaderCell(data) {
         if (!data) return;
         this._subHeader[data.column].data = data.value;
-        this.render();
     }
 
     /**
@@ -46,7 +58,6 @@ export default class VffTable extends HTMLElement {
     set tableCell(data) {
         if (!data) return;
         this._tableBody[data.coordinates.row][data.coordinates.col].data = data.value;
-        this.render();
     }
 
     get footer() {
@@ -58,7 +69,6 @@ export default class VffTable extends HTMLElement {
      */
     set footer(text) {
         this._footer = text;
-        this.render();
     }
 
     /*****************************************
@@ -66,6 +76,10 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     connectedCallback() {
+        this._header = 'Header Content';
+        this._subHeader = titles;
+        this._tableBody = tableData.body; // array of arrays
+        this._footer = 'Footer Content';
         this.render();
     }
 
@@ -77,79 +91,42 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     render() {
-        const header = this.renderHeader() || '';
-        const subHeader = this.renderSubHeader() || '';
-        const body = this.renderBody() || '';
-        const footer = this.renderFooter() || '';
-
-        this.innerHTML = `
-            <div class="vff-table">
-                ${header}
-                ${subHeader}
-                ${body}
-                ${footer}
-            </div>
-        `;
+        this.renderHeader();
+        this.renderSubHeader();
+        this.renderBody();
+        this.renderFooter();
     }
 
     renderHeader() {
         if (!this._header) return null;
-        return (
-            `<div class="vff-table__header">${this._header}</div>`
-        );
+        const header = this.shadowRoot.querySelector('#table-header');
+        header.textContent = this._header;
     }
 
     renderSubHeader() {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
-
-        const cols = [];
-
-        for (let i = 0; i < amountOfColumns; i++) {
-            const data = this._subHeader[i].data;
-            const col = `<div class="vff-table__col">${data}</div>`;
-            cols.push(col);
-        }
-
-        return (
-            `<div class="vff-table__sub-header">
-                    <div class="vff-table__row">
-                        ${cols.join('')}
-                    </div>
-                </div>`
-        );
+        const subHeader = this.shadowRoot.querySelector('#table-sub-header');
+        const row = new VffRow();
+        row.columns = this._subHeader;
+        subHeader.appendChild(row);
     }
 
     renderBody() {
         const amountOfRows = this._tableBody && this._tableBody.length;
-        if (!amountOfRows) return null;
-
-        const rows = [];
-
+        if (!amountOfRows) return;
         for (let i = 0; i < amountOfRows; i++) {
-            const amountOfColumns = this._tableBody[i].length;
-            const cols = [];
-
-            for (let j = 0; j < amountOfColumns; j++) {
-                let columnContent = this._tableBody[i][j].data;
-                let col = `<div class="vff-table__col">${columnContent}</div>`;
-
-                cols.push(col);
-            }
-
-            rows.push(`<div class="vff-table__row">${cols.join('')}</div>`);
+            const tableBody = this.shadowRoot.querySelector('#table-body');
+            const row = new VffRow();
+            row.columns = this._tableBody[i];
+            tableBody.appendChild(row);
         }
-
-        return (
-            `<div class="vff-table__body">${rows.join('')}</div>`
-        );
     }
 
     renderFooter() {
         if (!this._footer) return null;
-        return (
-            `<div class="vff-table__footer">${this._footer}</div>`
-        );
+        const footer = this.shadowRoot.querySelector('#table-footer');
+        footer.textContent = this.footer;
     }
 
     /*****************************************
@@ -165,6 +142,3 @@ export default class VffTable extends HTMLElement {
         };
     }
 }
-
-window.vff.define("vff-table", VffTable);
-

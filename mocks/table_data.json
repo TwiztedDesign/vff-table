@@ -4,32 +4,44 @@
   "body": [
     [
       {
-        "data": "Hello"
+        "data": "Hello",
+        "type": "text"
       },
       {
-        "data": "first"
+        "data": "first",
+        "type": "text"
       },
       {
-        "data": "row"
+        "data": "row",
+        "type": "text"
       }
     ],
     [
       {
-        "data": "This"
+        "data": "This",
+        "type": "text"
       },
       {
-        "data": "is second"
+        "data": "is second",
+        "type": "text"
       },
       {
-        "data": "row"
+        "data": "row",
+        "type": "text"
       }
     ],
     [
       {
-        "data": "minimum"
+        "data": "This",
+        "type": "text"
       },
       {
-        "data": "data here"
+        "data": "is third",
+        "type": "text"
+      },
+      {
+        "data": "row",
+        "type": "text"
       }
     ]
   ],

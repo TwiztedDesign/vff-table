@@ -1,5 +1,5 @@
-body {
-    color: green;
+* {
+    box-sizing: border-box;
 }
 
 .vff-table {
@@ -21,14 +21,14 @@ body {
     border-bottom: 1px solid;
 }
 
-.vff-table__row {
+vff-row {
     display: flex;
 }
 
-.vff-table__row:not(:last-child) {
+vff-row:not(:last-child) {
     border-bottom: 1px solid;
 }
 
-.vff-table__col {
+vff-col {
     width: 33.3%;
 }
