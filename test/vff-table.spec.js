@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-const vff_table = require('../src/vff-table');
+const vff_table = require('../src/components/vff-table');
 
 describe('Calculator', function() {
 

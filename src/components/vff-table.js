@@ -1,6 +1,6 @@
-import tableData from '../mocks/table_data';
-import titles from '../mocks/sub_header';
-import VffRow from "./components/vff-row";
+import tableData from '../../mocks/table_data';
+import titles from '../../mocks/sub_header';
+import VffRow from "./vff-row";
 
 export default class VffTable extends HTMLElement {
     constructor() {

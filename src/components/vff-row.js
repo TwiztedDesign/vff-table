@@ -1,10 +1,12 @@
 import VffCol from "./vff-col";
+import DragButton from './vff-drag-button';
 
 export default class VffRow extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
         this._columns = [];
+        this.dragButton = new DragButton();
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -21,45 +23,32 @@ export default class VffRow extends HTMLElement {
                     display: flex;
                     flex-direction: row;
                 }
-                #drag-button{
-                    height: 40px;
-                    width: 40px;
-                    background-color: black;
+                vff-drag-button{                   
                     position: absolute;
                     top: 0;
                     right: 0;
                 }
             </style>
             <div id="row">
-                <div id="columns"></div>
-                <div id="drag-button"></div>
+                <div id="columns"></div>               
             </div>
     `;
     }
 
     connectedCallback() {
+        this.dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
+        this.dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
+
         this.render();
-        // browser calls this method when the element is added to the document
-        // (can be called many times if an element is repeatedly added/removed)
     }
 
     disconnectedCallback() {
-        // browser calls this method when the element is removed from the document
-        // (can be called many times if an element is repeatedly added/removed)
+        this.dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
+        this.dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
     }
 
     static get observedAttributes() {
         return [/* array of attribute names to monitor for changes */];
-    }
-
-    // eslint-disable-next-line no-unused-vars
-    attributeChangedCallback(name, oldValue, newValue) {
-        // called when one of attributes listed above is modified
-    }
-
-    adoptedCallback() {
-        // called when the element is moved to a new document
-        // (happens in document.adoptNode, very rarely used)
     }
 
     /**
@@ -83,5 +72,15 @@ export default class VffRow extends HTMLElement {
             col.text = colData.data;
             columns.appendChild(col);
         }
+        const row = this.shadowRoot.querySelector('#row');
+        row.appendChild(this.dragButton);
+    }
+
+    _onAllowDrag() {
+        console.log('vff-allow-draggable');
+    }
+
+    _onPreventDrag() {
+        console.log('vff-prevent-draggable');
     }
 }
