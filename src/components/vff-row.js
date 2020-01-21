@@ -38,17 +38,12 @@ export default class VffRow extends HTMLElement {
     connectedCallback() {
         this.dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
         this.dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
-
         this.render();
     }
 
     disconnectedCallback() {
         this.dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
         this.dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
-    }
-
-    static get observedAttributes() {
-        return [/* array of attribute names to monitor for changes */];
     }
 
     /**
@@ -64,6 +59,7 @@ export default class VffRow extends HTMLElement {
 
     // Render
     render() {
+        if (this._columns.length < 1) return;
         const columns = this.shadowRoot.querySelector('#columns');
         for (let i = 0; i < this._columns.length; i++) {
             const colData = this._columns[i];

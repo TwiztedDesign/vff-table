@@ -7,18 +7,14 @@ export default class DragButton extends HTMLElement {
                 :host(*) {
                     box-sizing: border-box;
                 }
-                #drag-controller {
+                #drag-button {
                     height: 40px;
                     width: 40px;
                     background-color: black;
                 }
             </style>
-            <div id="drag-controller"></div>
+            <div id="drag-button"></div>
         `;
-    }
-
-    static get observedAttributes() {
-        return [/* array of attribute names to monitor for changes */];
     }
 
     connectedCallback() {
