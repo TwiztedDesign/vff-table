@@ -80,7 +80,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = titles;
         this._tableBody = tableData.body; // array of arrays
         this._footer = 'Footer Content';
-        this.render();
+        this._render();
     }
 
     disconnectedCallback() {
@@ -90,20 +90,20 @@ export default class VffTable extends HTMLElement {
      * render methods
      *****************************************/
 
-    render() {
-        this.renderHeader();
-        this.renderSubHeader();
-        this.renderBody();
-        this.renderFooter();
+    _render() {
+        this._renderHeader();
+        this._renderSubHeader();
+        this._renderBody();
+        this._renderFooter();
     }
 
-    renderHeader() {
+    _renderHeader() {
         if (!this._header) return null;
         const header = this.shadowRoot.querySelector('#table-header');
         header.textContent = this._header;
     }
 
-    renderSubHeader() {
+    _renderSubHeader() {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
         const subHeader = this.shadowRoot.querySelector('#table-sub-header');
@@ -112,7 +112,7 @@ export default class VffTable extends HTMLElement {
         subHeader.appendChild(row);
     }
 
-    renderBody() {
+    _renderBody() {
         const amountOfRows = this._tableBody && this._tableBody.length;
         if (!amountOfRows) return;
         for (let i = 0; i < amountOfRows; i++) {
@@ -123,7 +123,7 @@ export default class VffTable extends HTMLElement {
         }
     }
 
-    renderFooter() {
+    _renderFooter() {
         if (!this._footer) return null;
         const footer = this.shadowRoot.querySelector('#table-footer');
         footer.textContent = this.footer;

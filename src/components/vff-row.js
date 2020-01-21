@@ -6,7 +6,7 @@ export default class VffRow extends HTMLElement {
         super();
         this.attachShadow({mode: 'open'});
         this._columns = [];
-        this.dragButton = new DragButton();
+        this._dragButton = new DragButton();
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -36,14 +36,14 @@ export default class VffRow extends HTMLElement {
     }
 
     connectedCallback() {
-        this.dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
-        this.dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
-        this.render();
+        this._dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
+        this._dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
+        this._render();
     }
 
     disconnectedCallback() {
-        this.dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
-        this.dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
+        this._dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
+        this._dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
     }
 
     /**
@@ -58,7 +58,7 @@ export default class VffRow extends HTMLElement {
     }
 
     // Render
-    render() {
+    _render() {
         if (this._columns.length < 1) return;
         const columns = this.shadowRoot.querySelector('#columns');
         for (let i = 0; i < this._columns.length; i++) {
@@ -69,7 +69,7 @@ export default class VffRow extends HTMLElement {
             columns.appendChild(col);
         }
         const row = this.shadowRoot.querySelector('#row');
-        row.appendChild(this.dragButton);
+        row.appendChild(this._dragButton);
     }
 
     _onAllowDrag() {
