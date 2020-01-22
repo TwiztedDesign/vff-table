@@ -2,6 +2,7 @@ import tableData from '../../mocks/table_data';
 import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import DragButton from './vff-drag-button';
+import {getStyleVal, createElement} from '../utils/utils';
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -21,12 +22,15 @@ export default class VffTable extends HTMLElement {
                 #row-wrapper{
                     transition: all .15s;
                     position: relative;
-                }                                          
+                }                                                      
                 vff-drag-button{
                     transition: all .15s;                                 
                     position: absolute;
                     top: 0;
                     right: 0;
+                }
+                .over #row-placeholder {
+                background-color: yellow;
                 }
             </style>           
                 <div id="table-header"></div>
@@ -136,25 +140,33 @@ export default class VffTable extends HTMLElement {
         for (let i = 0; i < amountOfRows; i++) {
             const rowWrapper = document.createElement('div');
             rowWrapper.setAttribute('id', 'row-wrapper');
+            const placeholder = createElement('div', 'row-placeholder', null, null);
+            rowWrapper.appendChild(placeholder);
             const row = new VffRow();
             row.index = i;
             row.columns = this._tableBody[i];
             const dragButton = new DragButton();
             dragButton.index = i;
-            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i));
-            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
-            rowWrapper.addEventListener('mouseenter', function(table, btn) {
+            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i, rowWrapper));
+            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i, rowWrapper));
+
+            rowWrapper.addEventListener('mouseenter', function(table, btn, placeHolder) {
                 if (!table._isDragAllowed) return;
-                this.style.paddingTop = '40px';
-                btn.style.paddingTop = '40px';
+                const height = getStyleVal(this, 'height');
+                this.classList.add('over');
+                placeHolder.style.height = height;
+                btn.style.paddingTop = height;
                 table._tableSort['enter'] = btn.index;
-            }.bind(rowWrapper, this, dragButton));
-            rowWrapper.addEventListener('mouseleave', function(table, btn) {
+            }.bind(rowWrapper, this, dragButton, placeholder));
+
+            rowWrapper.addEventListener('mouseleave', function(table, btn, placeHolder) {
                 if (!table._isDragAllowed) return;
-                this.style.paddingTop = '0';
+                this.classList.remove('over');
+                placeHolder.style.height = '0';
                 btn.style.paddingTop = '0';
                 table._tableSort['leave'] = btn.index;
-            }.bind(rowWrapper, this, dragButton));
+            }.bind(rowWrapper, this, dragButton, placeholder));
+
             rowWrapper.appendChild(row);
             rowWrapper.appendChild(dragButton);
             fragment.appendChild(rowWrapper);
