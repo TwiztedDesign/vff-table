@@ -17,20 +17,18 @@ export default class VffTable extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
-                    box-sizing: border-box;
+                    box-sizing: border-box;                   
                 }
-                #row-wrapper{
-                    transition: all .15s;
+                #row-wrapper{                   
                     position: relative;
                 }                                                      
-                vff-drag-button{
-                    transition: all .15s;                                 
+                vff-drag-button{                                                     
                     position: absolute;
                     top: 0;
                     right: 0;
-                }
-                .over #row-placeholder {
-                background-color: yellow;
+                }               
+                .over #row-placeholder {               
+                    background-color: yellow;
                 }
             </style>           
                 <div id="table-header"></div>
