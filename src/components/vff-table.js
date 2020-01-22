@@ -19,15 +19,21 @@ export default class VffTable extends HTMLElement {
                 :host(*) {
                     box-sizing: border-box;                   
                 }
-                #row-wrapper{                   
+                #row-wrapper{          
+                    margin: 5px 0;         
                     position: relative;
                 }                                                      
                 vff-drag-button{                                                     
                     position: absolute;
                     top: 0;
                     right: 0;
+                }
+                
+                .over vff-drag-button {
+                    margin: 5px 0;
                 }               
-                .over #row-placeholder {               
+                .over #row-placeholder {         
+                    margin: 5px 0;      
                     background-color: yellow;
                 }
             </style>           
