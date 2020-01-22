@@ -10,6 +10,7 @@ export default class VffTable extends HTMLElement {
         this._header = null;
         this._subHeader = null;
         this._tableBody = null;
+        this._tableSort = {};
         this._footer = null;
         this._isDragAllowed = false;
         this.shadowRoot.innerHTML = `
@@ -140,17 +141,19 @@ export default class VffTable extends HTMLElement {
             row.columns = this._tableBody[i];
             const dragButton = new DragButton();
             dragButton.index = i;
-            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
-            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
+            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i));
+            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
             rowWrapper.addEventListener('mouseenter', function(table, btn) {
                 if (!table._isDragAllowed) return;
                 this.style.paddingTop = '40px';
                 btn.style.paddingTop = '40px';
+                table._tableSort['enter'] = btn.index;
             }.bind(rowWrapper, this, dragButton));
             rowWrapper.addEventListener('mouseleave', function(table, btn) {
                 if (!table._isDragAllowed) return;
                 this.style.paddingTop = '0';
                 btn.style.paddingTop = '0';
+                table._tableSort['leave'] = btn.index;
             }.bind(rowWrapper, this, dragButton));
             rowWrapper.appendChild(row);
             rowWrapper.appendChild(dragButton);
@@ -164,13 +167,31 @@ export default class VffTable extends HTMLElement {
         return this.footer;
     }
 
+    /**
+     * @param index - of dragged element
+     * @private
+     */
     _onAllowDrag() {
         this._isDragAllowed = true;
     }
 
-    _onPreventDrag() {
-        if (this._isDragAllowed) this._render();
+    /**
+     * @param index - of dragged element
+     * @private
+     */
+    _onPreventDrag(index) {
+        this._tableSort['drop'] = index;
+        this._arrangeDataModel();
         this._isDragAllowed = false;
+        this._render();
+    }
+
+    _arrangeDataModel() {
+        const from = this._tableSort.drop;
+        const to = this._tableSort.enter;
+        const tableData = this._tableBody.slice();
+        tableData.splice(to, 0, tableData.splice(from, 1)[0]);
+        this._tableBody = tableData;
     }
 
     /*****************************************
