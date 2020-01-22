@@ -1,6 +1,7 @@
 import tableData from '../../mocks/table_data';
 import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
+import DragButton from './vff-drag-button';
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -10,18 +11,27 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
+        this._isDragAllowed = false;
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
                     box-sizing: border-box;
                 }
-            </style>
-            <div class="vff-table">
+                #row-wrapper{
+                    transition: all .15s;
+                    position: relative;
+                }                                          
+                vff-drag-button{
+                    transition: all .15s;                                 
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                }
+            </style>           
                 <div id="table-header"></div>
                 <div id="table-sub-header"></div>
                 <div id="table-body"></div>
-                <div id="table-footer"></div>
-            </div>
+                <div id="table-footer"></div>           
         `;
     }
 
@@ -91,42 +101,76 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     _render() {
-        this._renderHeader();
-        this._renderSubHeader();
-        this._renderBody();
-        this._renderFooter();
+        const header = this.shadowRoot.querySelector('#table-header');
+        header.innerHTML = '';
+        header.textContent = this._renderHeader();
+        const subHeader = this.shadowRoot.querySelector('#table-sub-header');
+        subHeader.innerHTML = '';
+        subHeader.appendChild(this._renderSubHeader());
+        const tableBody = this.shadowRoot.querySelector('#table-body');
+        tableBody.innerHTML = '';
+        tableBody.appendChild(this._renderBody());
+        const footer = this.shadowRoot.querySelector('#table-footer');
+        footer.innerHTML = '';
+        footer.textContent = this._renderFooter();
     }
 
     _renderHeader() {
         if (!this._header) return null;
-        const header = this.shadowRoot.querySelector('#table-header');
-        header.textContent = this._header;
+        return this._header;
     }
 
     _renderSubHeader() {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
-        const subHeader = this.shadowRoot.querySelector('#table-sub-header');
         const row = new VffRow();
         row.columns = this._subHeader;
-        subHeader.appendChild(row);
+        return row;
     }
 
     _renderBody() {
         const amountOfRows = this._tableBody && this._tableBody.length;
         if (!amountOfRows) return;
+        const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
-            const tableBody = this.shadowRoot.querySelector('#table-body');
+            const rowWrapper = document.createElement('div');
+            rowWrapper.setAttribute('id', 'row-wrapper');
             const row = new VffRow();
+            row.index = i;
             row.columns = this._tableBody[i];
-            tableBody.appendChild(row);
+            const dragButton = new DragButton();
+            dragButton.index = i;
+            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
+            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
+            rowWrapper.addEventListener('mouseenter', function(table, btn) {
+                if (!table._isDragAllowed) return;
+                this.style.paddingTop = '40px';
+                btn.style.paddingTop = '40px';
+            }.bind(rowWrapper, this, dragButton));
+            rowWrapper.addEventListener('mouseleave', function(table, btn) {
+                if (!table._isDragAllowed) return;
+                this.style.paddingTop = '0';
+                btn.style.paddingTop = '0';
+            }.bind(rowWrapper, this, dragButton));
+            rowWrapper.appendChild(row);
+            rowWrapper.appendChild(dragButton);
+            fragment.appendChild(rowWrapper);
         }
+        return fragment;
     }
 
     _renderFooter() {
         if (!this._footer) return null;
-        const footer = this.shadowRoot.querySelector('#table-footer');
-        footer.textContent = this.footer;
+        return this.footer;
+    }
+
+    _onAllowDrag() {
+        this._isDragAllowed = true;
+    }
+
+    _onPreventDrag() {
+        if (this._isDragAllowed) this._render();
+        this._isDragAllowed = false;
     }
 
     /*****************************************

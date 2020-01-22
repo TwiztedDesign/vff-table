@@ -1,33 +1,23 @@
 import VffCol from "./vff-col";
-import DragButton from './vff-drag-button';
 
 export default class VffRow extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
+        this._index = null;
         this._columns = [];
-        this._dragButton = new DragButton();
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
                     box-sizing: border-box;
-                }
-                :host{                                  
-                    margin: 5px;                   
-                }
-                #row{
-                    position:relative;
+                }              
+                #row{                   
                     width: 100%;  
                 }
                 #columns{                  
                     display: flex;
                     flex-direction: row;
-                }
-                vff-drag-button{                   
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                }
+                }               
             </style>
             <div id="row">
                 <div id="columns"></div>               
@@ -36,14 +26,23 @@ export default class VffRow extends HTMLElement {
     }
 
     connectedCallback() {
-        this._dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this));
-        this._dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this));
         this._render();
     }
 
     disconnectedCallback() {
-        this._dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
-        this._dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
+        //this._dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
+        //this._dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
+    }
+
+    /**
+     * @param {number} num
+     */
+    set index(num) {
+        this._index = num;
+    }
+
+    get index() {
+        return this._index;
     }
 
     /**
@@ -68,15 +67,5 @@ export default class VffRow extends HTMLElement {
             col.text = colData.data;
             columns.appendChild(col);
         }
-        const row = this.shadowRoot.querySelector('#row');
-        row.appendChild(this._dragButton);
-    }
-
-    _onAllowDrag() {
-        console.log('vff-allow-draggable');
-    }
-
-    _onPreventDrag() {
-        console.log('vff-prevent-draggable');
     }
 }

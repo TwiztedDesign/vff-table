@@ -10,7 +10,7 @@ export default class VffCol extends HTMLElement {
                     box-sizing: border-box;
                 }
                 :host{
-                    width: 33%;                    
+                    width: 33.333333333333336%;                    
                     height: 40px;
                     background-color: #cccccc;
                 }
