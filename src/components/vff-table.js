@@ -146,6 +146,7 @@ export default class VffTable extends HTMLElement {
             rowWrapper.setAttribute('id', 'row-wrapper');
             const placeholder = createElement('div', 'row-placeholder', null, null);
             rowWrapper.appendChild(placeholder);
+
             const row = new VffRow();
             row.index = i;
             row.columns = this._tableBody[i];
@@ -187,26 +188,33 @@ export default class VffTable extends HTMLElement {
      * @param index - of dragged element
      * @private
      */
-    _onAllowDrag() {
+    _onAllowDrag(index, rowWrapper) {
         this._isDragAllowed = true;
+        rowWrapper.style.opacity = '0.6';
     }
 
     /**
      * @param index - of dragged element
      * @private
      */
-    _onPreventDrag(index) {
+    _onPreventDrag(index, rowWrapper) {
         this._tableSort['drop'] = index;
+        rowWrapper.style.opacity = '1';
         this._arrangeDataModel();
         this._isDragAllowed = false;
         this._render();
     }
 
     _arrangeDataModel() {
-        const from = this._tableSort.drop;
-        const to = this._tableSort.enter;
+        const from = this._tableSort.drop; // 0
+        const to = this._tableSort.enter; // 2
         const tableData = this._tableBody.slice();
-        tableData.splice(to, 0, tableData.splice(from, 1)[0]);
+        if (from < to) {
+            tableData.splice((to - 1), 0, tableData.splice(from, 1)[0]);
+        } else {
+            tableData.splice(to, 0, tableData.splice(from, 1)[0]);
+        }
+
         this._tableBody = tableData;
     }
 
