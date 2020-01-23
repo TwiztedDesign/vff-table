@@ -43,6 +43,20 @@
         "data": "row",
         "type": "text"
       }
+    ],
+    [
+      {
+        "data": "This",
+        "type": "text"
+      },
+      {
+        "data": "is forth",
+        "type": "text"
+      },
+      {
+        "data": "row",
+        "type": "text"
+      }
     ]
   ],
   "footer": "Some footer text"

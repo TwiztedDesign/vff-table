@@ -3,7 +3,8 @@ import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import DragButton from './vff-drag-button';
 import DraggableRow from '../classes/draggable-row';
-import {getStyleVal, createElement} from '../utils/utils';
+import {getStyleVal} from "../utils/utils";
+// import {createElement} from '../utils/utils';
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -22,21 +23,14 @@ export default class VffTable extends HTMLElement {
                     box-sizing: border-box;                   
                 }
                 #row-wrapper{          
+                    transition: opacity .2s;
                     margin: 5px 0;         
                     position: relative;
-                }                                                      
+                }                                           
                 vff-drag-button{                                                     
                     position: absolute;
                     top: 0;
                     right: 0;
-                }
-                
-                .over vff-drag-button {
-                    margin: 5px 0;
-                }               
-                .over #row-placeholder {         
-                    margin: 5px 0;      
-                    background-color: yellow;
                 }
             </style>           
                 <div id="table-header"></div>
@@ -146,35 +140,34 @@ export default class VffTable extends HTMLElement {
         for (let i = 0; i < amountOfRows; i++) {
             const rowWrapper = document.createElement('div');
             rowWrapper.setAttribute('id', 'row-wrapper');
-            const placeholder = createElement('div', 'row-placeholder', null, null);
-            rowWrapper.appendChild(placeholder);
-
+            rowWrapper.setAttribute('index', i);
             const row = new VffRow();
-            row.index = i;
             row.columns = this._tableBody[i];
             const dragButton = new DragButton();
-            dragButton.index = i;
             dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i, rowWrapper));
             dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
-
             // for rows that are being hovered
-            rowWrapper.addEventListener('mouseenter', function(table, btn, placeHolder) {
-                if (!table._isDragAllowed) return;
-                const height = getStyleVal(this, 'height');
-                this.classList.add('over');
-                placeHolder.style.height = height;
-                btn.style.paddingTop = height;
-                table._tableSort.enter = btn.index;
-            }.bind(rowWrapper, this, dragButton, placeholder));
-
+            rowWrapper.addEventListener('mouseover', function(index, rowWrapper) {
+                if (!this._isDragAllowed) return;
+                rowWrapper.style.opacity = '0.5';
+                this._tableSort.enter = index;
+                const draggableRow = this._draggableRow;
+                const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
+                const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
+                const height = parseInt(draggableRow.height);
+                const sum = height + margin + 'px';
+                if (this._tableSort.enter > this._tableSort.leave) {
+                    rowToMove.style.top = '-' + sum;
+                } else {
+                    rowToMove.style.top = sum;
+                }
+            }.bind(this, i, rowWrapper));
             // for rows that are being hovered
-            rowWrapper.addEventListener('mouseleave', function(table, btn, placeHolder) {
-                if (!table._isDragAllowed) return;
-                this.classList.remove('over');
-                placeHolder.style.height = '0';
-                btn.style.paddingTop = '0';
-                table._tableSort.leave = btn.index;
-            }.bind(rowWrapper, this, dragButton, placeholder));
+            rowWrapper.addEventListener('mouseout', function(index, rowWrapper) {
+                if (!this._isDragAllowed) return;
+                rowWrapper.style.opacity = '1';
+                this._tableSort.leave = index;
+            }.bind(this, i, rowWrapper));
 
             rowWrapper.appendChild(row);
             rowWrapper.appendChild(dragButton);
@@ -215,13 +208,12 @@ export default class VffTable extends HTMLElement {
         const from = this._tableSort.drop;
         const to = this._tableSort.enter;
         const tableData = this._tableBody.slice();
-        if (from === undefined || to === undefined) return;
+        if (from === null || to === null) return;
         if (from < to) {
-            tableData.splice((to - 1), 0, tableData.splice(from, 1)[0]);
+            tableData.splice((to), 0, tableData.splice(from, 1)[0]);
         } else {
             tableData.splice(to, 0, tableData.splice(from, 1)[0]);
         }
-
         this._tableBody = tableData;
     }
 
