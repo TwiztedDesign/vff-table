@@ -2,6 +2,7 @@ import tableData from '../../mocks/table_data';
 import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import DragButton from './vff-drag-button';
+import DraggableRow from '../classes/draggable-row';
 import {getStyleVal, createElement} from '../utils/utils';
 
 export default class VffTable extends HTMLElement {
@@ -14,8 +15,7 @@ export default class VffTable extends HTMLElement {
         this._footer = null;
         this._tableSort = {enter: null, leave: null, drop: null};
         this._isDragAllowed = false; // flag
-        this._draggableRow = {node: null, topPosition: null, startY: null}; // reference to a curren row that is being dragged
-        this._followTheMouse = this._followTheMouse.bind(this);
+        this._draggableRow = null;
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -188,11 +188,6 @@ export default class VffTable extends HTMLElement {
         return this.footer;
     }
 
-    _followTheMouse(event) {
-        let newTop = this._draggableRow.topPosition + (event.pageY - this._draggableRow.startY);
-        this._draggableRow.node.style.top = newTop + 'px';
-    }
-
     /**
      * @param index
      * @param rowWrapper
@@ -201,11 +196,7 @@ export default class VffTable extends HTMLElement {
      */
     _onAllowDrag(index, rowWrapper, event) {
         this._isDragAllowed = true;
-        this._draggableRow.node = rowWrapper;
-        this._draggableRow.node.style.opacity = '0.6';
-        this._draggableRow.topPosition = parseInt(getStyleVal(this._draggableRow.node, 'top'));
-        this._draggableRow.startY = event.detail;
-        window.addEventListener('mousemove', this._followTheMouse);
+        this._draggableRow = new DraggableRow({domNode: rowWrapper, startY: event.detail});
     }
 
     /**
@@ -214,9 +205,7 @@ export default class VffTable extends HTMLElement {
      */
     _onPreventDrag(index) {
         this._tableSort.drop = index;
-        this._draggableRow.node.style.opacity = '1';
-        this.startY = 0;
-        window.removeEventListener('mousemove', this._followTheMouse);
+        this._draggableRow.reset();
         this._arrangeDataModel();
         this._isDragAllowed = false;
         this._render();
