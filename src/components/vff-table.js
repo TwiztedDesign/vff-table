@@ -233,9 +233,12 @@ export default class VffTable extends HTMLElement {
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            if (this._tableSort.enter > this._tableSort.leave) {
+            const enter = this._tableSort.enter;
+            const leave = this._tableSort.leave;
+            if (enter > leave) { // down
                 rowToMove.style.top = '-' + sum;
-            } else {
+            }
+            if (enter < leave) { // up
                 rowToMove.style.top = sum;
             }
         }.bind(this, index, rowWrapper));
