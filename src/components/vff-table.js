@@ -34,12 +34,11 @@ export default class VffTable extends HTMLElement {
                     background-color: #00cccd;
                 }                         
                 .row-wrapper{         
-                    height: 50px;    
-                    transition: opacity .2s;                            
+                    height: 50px;                                                   
                     position: relative;
                 }                                                          
                 vff-drag-button{
-                    opacity: 0.3;     
+                    opacity: 0.1;     
                     height: 100%;  
                     width: 50px;                                              
                     position: absolute;
