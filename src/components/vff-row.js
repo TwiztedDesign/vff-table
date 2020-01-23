@@ -13,13 +13,17 @@ export default class VffRow extends HTMLElement {
                 }              
                 #row{              
                     height: 100%;     
-                    width: 100%;  
+                    width: 100%; 
+                    border-bottom: 1px solid #f0f0f0;
                 }
                 #columns{        
                     height: 100%;      
                     display: flex;
                     flex-direction: row;
-                }               
+                }
+                vff-col:not(:last-child){
+                    border-right: 1px solid #f0f0f0;
+                }       
             </style>
             <div id="row">
                 <div id="columns"></div>               

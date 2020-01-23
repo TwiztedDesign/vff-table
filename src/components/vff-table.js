@@ -20,14 +20,24 @@ export default class VffTable extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
-                    box-sizing: border-box;                   
-                }               
+                    box-sizing: border-box;                                
+                }
+                #table-header,
+                #table-footer{
+                    text-align: center;
+                    margin: 10px 0;
+                    background-color: #00cccd29;
+                }
+                                         
+                #table-sub-header {
+                    height: 50px;
+                    background-color: #00cccd;
+                }                         
                 .row-wrapper{         
                     height: 50px;    
-                    transition: opacity .2s;
-                    margin: 5px 0;         
+                    transition: opacity .2s;                            
                     position: relative;
-                }                                           
+                }                                                          
                 vff-drag-button{
                     opacity: 0.3;     
                     height: 100%;  
@@ -37,10 +47,12 @@ export default class VffTable extends HTMLElement {
                     right: 0;
                 }               
             </style>           
-                <div id="table-header"></div>
-                <div id="table-sub-header"></div>
-                <div id="table-body"></div>
-                <div id="table-footer"></div>           
+                <div id="table">
+                    <div id="table-header"></div>
+                    <div id="table-sub-header"></div>
+                    <div id="table-body"></div>
+                    <div id="table-footer"></div>
+                </div>           
         `;
     }
 
@@ -142,44 +154,10 @@ export default class VffTable extends HTMLElement {
         if (!amountOfRows) return;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
-            const rowWrapper = document.createElement('div');
-            rowWrapper.setAttribute('class', 'row-wrapper');
-            rowWrapper.setAttribute('index', i);
             const row = new VffRow();
             row.columns = this._tableBody[i];
-            const dragButton = new DragButton();
-            dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i, rowWrapper));
-            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
-
-            // for rows that are being hovered
-            rowWrapper.addEventListener('mouseover', function(index, rowWrapper) {
-                if (!this._isDragAllowed) return;
-                rowWrapper.style.opacity = '0.5';
-                this._tableSort.enter = index;
-
-                const draggableRow = this._draggableRow;
-                const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
-                const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
-                const height = parseInt(draggableRow.height);
-                const sum = height + margin + 'px';
-                if (this._tableSort.enter > this._tableSort.leave) {
-                    rowToMove.style.top = '-' + sum;
-                } else {
-                    rowToMove.style.top = sum;
-                }
-                // rowToMove.setAttribute('index', draggableRow._domNode.getAttribute('index'));
-                // draggableRow._domNode.setAttribute('index', index);
-            }.bind(this, i, rowWrapper));
-            // for rows that are being hovered
-            rowWrapper.addEventListener('mouseout', function(index, rowWrapper) {
-                if (!this._isDragAllowed) return;
-                rowWrapper.style.opacity = '1';
-                this._tableSort.leave = index;
-            }.bind(this, i, rowWrapper));
-
-            rowWrapper.appendChild(row);
-            rowWrapper.appendChild(dragButton);
-            fragment.appendChild(rowWrapper);
+            const draggableRow = this._makeDraggable(row, i);
+            fragment.appendChild(draggableRow);
         }
         return fragment;
     }
@@ -208,8 +186,15 @@ export default class VffTable extends HTMLElement {
         this._tableSort.drop = index;
         this._draggableRow.reset();
         this._arrangeDataModel();
+        this._resetTableSort();
         this._isDragAllowed = false;
         this._render();
+    }
+
+    _resetTableSort() {
+        this._tableSort.enter = null;
+        this._tableSort.leave = null;
+        this._tableSort.drop = null;
     }
 
     _arrangeDataModel() {
@@ -223,6 +208,48 @@ export default class VffTable extends HTMLElement {
             tableData.splice(to, 0, tableData.splice(from, 1)[0]);
         }
         this._tableBody = tableData;
+    }
+
+    /**
+     * @param row
+     * @param index
+     * @return {HTMLDivElement} - row enabled to be dragged and reordered across the table
+     * @private
+     */
+    _makeDraggable(row, index) {
+        const rowWrapper = document.createElement('div');
+        rowWrapper.setAttribute('class', 'row-wrapper');
+        rowWrapper.setAttribute('index', index);
+        const dragButton = new DragButton();
+        dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
+        dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
+
+        rowWrapper.addEventListener('mouseover', function(index, rowWrapper) {
+            if (!this._isDragAllowed) return;
+            rowWrapper.style.opacity = '0.5';
+            this._tableSort.enter = index;
+
+            const draggableRow = this._draggableRow;
+            const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
+            const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
+            const height = parseInt(draggableRow.height);
+            const sum = height + margin + 'px';
+            if (this._tableSort.enter > this._tableSort.leave) {
+                rowToMove.style.top = '-' + sum;
+            } else {
+                rowToMove.style.top = sum;
+            }
+        }.bind(this, index, rowWrapper));
+
+        rowWrapper.addEventListener('mouseout', function(index, rowWrapper) {
+            if (!this._isDragAllowed) return;
+            rowWrapper.style.opacity = '1';
+            this._tableSort.leave = index;
+        }.bind(this, index, rowWrapper));
+
+        rowWrapper.appendChild(row);
+        rowWrapper.appendChild(dragButton);
+        return rowWrapper;
     }
 
     /*****************************************

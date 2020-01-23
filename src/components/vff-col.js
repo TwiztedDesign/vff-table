@@ -11,8 +11,13 @@ export default class VffCol extends HTMLElement {
                 }
                 :host{
                     width: 33.333333333333336%;                    
+                    height: 100%;                   
+                }
+                #col{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
                     height: 100%;
-                    background-color: #cccccc;
                 }
             </style>
             <div id="col"></div>
