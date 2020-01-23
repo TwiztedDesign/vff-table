@@ -11,10 +11,12 @@ export default class VffRow extends HTMLElement {
                 :host(*) {
                     box-sizing: border-box;
                 }              
-                #row{                   
+                #row{              
+                    height: 100%;     
                     width: 100%;  
                 }
-                #columns{                  
+                #columns{        
+                    height: 100%;      
                     display: flex;
                     flex-direction: row;
                 }               
@@ -27,11 +29,6 @@ export default class VffRow extends HTMLElement {
 
     connectedCallback() {
         this._render();
-    }
-
-    disconnectedCallback() {
-        //this._dragButton.removeEventListener('vff-allow-draggable', this._onAllowDrag);
-        //this._dragButton.removeEventListener('vff-prevent-draggable', this._onPreventDrag);
     }
 
     /**

@@ -21,17 +21,21 @@ export default class VffTable extends HTMLElement {
             <style>
                 :host(*) {
                     box-sizing: border-box;                   
-                }
-                #row-wrapper{          
+                }               
+                .row-wrapper{         
+                    height: 50px;    
                     transition: opacity .2s;
                     margin: 5px 0;         
                     position: relative;
                 }                                           
-                vff-drag-button{                                                     
+                vff-drag-button{
+                    opacity: 0.3;     
+                    height: 100%;  
+                    width: 50px;                                              
                     position: absolute;
                     top: 0;
                     right: 0;
-                }
+                }               
             </style>           
                 <div id="table-header"></div>
                 <div id="table-sub-header"></div>
@@ -139,18 +143,20 @@ export default class VffTable extends HTMLElement {
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
             const rowWrapper = document.createElement('div');
-            rowWrapper.setAttribute('id', 'row-wrapper');
+            rowWrapper.setAttribute('class', 'row-wrapper');
             rowWrapper.setAttribute('index', i);
             const row = new VffRow();
             row.columns = this._tableBody[i];
             const dragButton = new DragButton();
             dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i, rowWrapper));
             dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
+
             // for rows that are being hovered
             rowWrapper.addEventListener('mouseover', function(index, rowWrapper) {
                 if (!this._isDragAllowed) return;
                 rowWrapper.style.opacity = '0.5';
                 this._tableSort.enter = index;
+
                 const draggableRow = this._draggableRow;
                 const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
                 const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
@@ -161,6 +167,8 @@ export default class VffTable extends HTMLElement {
                 } else {
                     rowToMove.style.top = sum;
                 }
+                // rowToMove.setAttribute('index', draggableRow._domNode.getAttribute('index'));
+                // draggableRow._domNode.setAttribute('index', index);
             }.bind(this, i, rowWrapper));
             // for rows that are being hovered
             rowWrapper.addEventListener('mouseout', function(index, rowWrapper) {

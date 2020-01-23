@@ -9,10 +9,10 @@ export default class DragButton extends HTMLElement {
                 :host(*) {
                     box-sizing: border-box;
                 }
-                #drag-button {
+                #drag-button {                   
                     cursor: move;
-                    height: 40px;
-                    width: 40px;
+                    height: 100%;
+                    width: 100%;
                     background-color: black;
                 }
             </style>

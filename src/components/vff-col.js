@@ -11,7 +11,7 @@ export default class VffCol extends HTMLElement {
                 }
                 :host{
                     width: 33.333333333333336%;                    
-                    height: 40px;
+                    height: 100%;
                     background-color: #cccccc;
                 }
             </style>
