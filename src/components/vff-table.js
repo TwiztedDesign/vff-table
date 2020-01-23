@@ -11,9 +11,11 @@ export default class VffTable extends HTMLElement {
         this._header = null;
         this._subHeader = null;
         this._tableBody = null;
-        this._tableSort = {};
         this._footer = null;
-        this._isDragAllowed = false;
+        this._tableSort = {enter: null, leave: null, drop: null};
+        this._isDragAllowed = false; // flag
+        this._draggableRow = {node: null, topPosition: null, startY: null}; // reference to a curren row that is being dragged
+        this._followTheMouse = this._followTheMouse.bind(this);
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -153,23 +155,25 @@ export default class VffTable extends HTMLElement {
             const dragButton = new DragButton();
             dragButton.index = i;
             dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, i, rowWrapper));
-            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i, rowWrapper));
+            dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, i));
 
+            // for rows that are being hovered
             rowWrapper.addEventListener('mouseenter', function(table, btn, placeHolder) {
                 if (!table._isDragAllowed) return;
                 const height = getStyleVal(this, 'height');
                 this.classList.add('over');
                 placeHolder.style.height = height;
                 btn.style.paddingTop = height;
-                table._tableSort['enter'] = btn.index;
+                table._tableSort.enter = btn.index;
             }.bind(rowWrapper, this, dragButton, placeholder));
 
+            // for rows that are being hovered
             rowWrapper.addEventListener('mouseleave', function(table, btn, placeHolder) {
                 if (!table._isDragAllowed) return;
                 this.classList.remove('over');
                 placeHolder.style.height = '0';
                 btn.style.paddingTop = '0';
-                table._tableSort['leave'] = btn.index;
+                table._tableSort.leave = btn.index;
             }.bind(rowWrapper, this, dragButton, placeholder));
 
             rowWrapper.appendChild(row);
@@ -184,31 +188,45 @@ export default class VffTable extends HTMLElement {
         return this.footer;
     }
 
+    _followTheMouse(event) {
+        let newTop = this._draggableRow.topPosition + (event.pageY - this._draggableRow.startY);
+        this._draggableRow.node.style.top = newTop + 'px';
+    }
+
     /**
-     * @param index - of dragged element
+     * @param index
+     * @param rowWrapper
+     * @param event
      * @private
      */
-    _onAllowDrag(index, rowWrapper) {
+    _onAllowDrag(index, rowWrapper, event) {
         this._isDragAllowed = true;
-        rowWrapper.style.opacity = '0.6';
+        this._draggableRow.node = rowWrapper;
+        this._draggableRow.node.style.opacity = '0.6';
+        this._draggableRow.topPosition = parseInt(getStyleVal(this._draggableRow.node, 'top'));
+        this._draggableRow.startY = event.detail;
+        window.addEventListener('mousemove', this._followTheMouse);
     }
 
     /**
      * @param index - of dragged element
      * @private
      */
-    _onPreventDrag(index, rowWrapper) {
-        this._tableSort['drop'] = index;
-        rowWrapper.style.opacity = '1';
+    _onPreventDrag(index) {
+        this._tableSort.drop = index;
+        this._draggableRow.node.style.opacity = '1';
+        this.startY = 0;
+        window.removeEventListener('mousemove', this._followTheMouse);
         this._arrangeDataModel();
         this._isDragAllowed = false;
         this._render();
     }
 
     _arrangeDataModel() {
-        const from = this._tableSort.drop; // 0
-        const to = this._tableSort.enter; // 2
+        const from = this._tableSort.drop;
+        const to = this._tableSort.enter;
         const tableData = this._tableBody.slice();
+        if (from === undefined || to === undefined) return;
         if (from < to) {
             tableData.splice((to - 1), 0, tableData.splice(from, 1)[0]);
         } else {

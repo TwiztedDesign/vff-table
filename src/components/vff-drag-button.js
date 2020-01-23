@@ -43,8 +43,8 @@ export default class DragButton extends HTMLElement {
         document.removeEventListener('mouseup', this._onMouseUp);
     }
 
-    _onMouseDown() {
-        const event = new Event('vff-allow-draggable');
+    _onMouseDown(e) {
+        const event = new CustomEvent('vff-allow-draggable', {detail: e.pageY});
         this._mouseDown = true;
         this.dispatchEvent(event);
     }
