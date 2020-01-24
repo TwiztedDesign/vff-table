@@ -3,33 +3,7 @@
     box-sizing: border-box;
 }
 
-.vff-table {
-    border: 1px solid;
-}
-
-.vff-table__header {
-    border-bottom: 1px solid;
-}
-
-.vff-table__sub-header {
-    border-bottom: 1px solid;
-}
-
-.vff-table__body {
-    display: flex;
-    flex-direction: column;
-
-    border-bottom: 1px solid;
-}
-
-vff-row {
-    display: flex;
-}
-
-vff-row:not(:last-child) {
-    border-bottom: 1px solid;
-}
-
-vff-col {
-    width: 33.3%;
+.table-container {
+    width: 800px;
+    margin: auto;
 }

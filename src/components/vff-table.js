@@ -14,7 +14,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
-        this._tableSort = {over: null, leave: null, drop: null};
+        this._tableSort = {over: null, drag: null, drop: null};
         this._isDragAllowed = false; // flag
         this._draggableRow = null;
         this.shadowRoot.innerHTML = `
@@ -192,7 +192,7 @@ export default class VffTable extends HTMLElement {
 
     _resetTableSort() {
         this._tableSort.over = null;
-        this._tableSort.leave = null;
+        this._tableSort.drag = null;
         this._tableSort.drop = null;
     }
 
@@ -225,18 +225,13 @@ export default class VffTable extends HTMLElement {
 
         rowWrapper.addEventListener('mousedown', function(rowWrapper) {
             if (!this._isDragAllowed) return;
-            rowWrapper.style.zIndex = '-1000'; // sink the element under the rest of the rows to allow mouseover event to fire
+            this._tableSort.drag = index;
+            this._tableSort.over = index;
+            rowWrapper.style.zIndex = '-1000';
         }.bind(this, rowWrapper));
 
-        rowWrapper.addEventListener('mouseout', function(index) {
+        rowWrapper.addEventListener('mouseenter', function(index) {
             if (!this._isDragAllowed) return;
-            this._tableSort.leave = index;
-        }.bind(this, index, rowWrapper));
-
-        rowWrapper.addEventListener('mouseover', function(index) {
-            if (!this._isDragAllowed) return;
-            // todo : check why double mouseover event is fired
-            if (this._tableSort.over === index) return; // prevent multiple mouseover events making extra work
             this._tableSort.over = index;
             const draggableRow = this._draggableRow;
             const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
@@ -244,10 +239,10 @@ export default class VffTable extends HTMLElement {
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
             const over = this._tableSort.over;
-            const leave = this._tableSort.leave;
-            if (over > leave) { // down
+            const drag = this._tableSort.drag;
+            if (over > drag) { // down
                 rowToMove.style.top = '-' + sum;
-            } else if (over < leave) { // up
+            } else if (over < drag) { // up
                 rowToMove.style.top = sum;
             }
         }.bind(this, index, rowWrapper));
