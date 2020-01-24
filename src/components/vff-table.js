@@ -14,7 +14,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
-        this._tableSort = {enter: null, leave: null, drop: null};
+        this._tableSort = {over: null, leave: null, drop: null};
         this._isDragAllowed = false; // flag
         this._draggableRow = null;
         this.shadowRoot.innerHTML = `
@@ -191,14 +191,14 @@ export default class VffTable extends HTMLElement {
     }
 
     _resetTableSort() {
-        this._tableSort.enter = null;
+        this._tableSort.over = null;
         this._tableSort.leave = null;
         this._tableSort.drop = null;
     }
 
     _arrangeDataModel() {
         const from = this._tableSort.drop;
-        const to = this._tableSort.enter;
+        const to = this._tableSort.over;
         const tableData = this._tableBody.slice();
         if (from === null || to === null) return;
         if (from < to) {
@@ -223,30 +223,33 @@ export default class VffTable extends HTMLElement {
         dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
 
-        rowWrapper.addEventListener('mouseover', function(index, rowWrapper) {
+        rowWrapper.addEventListener('mousedown', function(rowWrapper) {
             if (!this._isDragAllowed) return;
-            rowWrapper.style.opacity = '0.5';
-            this._tableSort.enter = index;
+            rowWrapper.style.zIndex = '-1000'; // sink the element under the rest of the rows to allow mouseover event to fire
+        }.bind(this, rowWrapper));
 
+        rowWrapper.addEventListener('mouseout', function(index) {
+            if (!this._isDragAllowed) return;
+            this._tableSort.leave = index;
+        }.bind(this, index, rowWrapper));
+
+        rowWrapper.addEventListener('mouseover', function(index) {
+            if (!this._isDragAllowed) return;
+            // todo : check why double mouseover event is fired
+            if (this._tableSort.over === index) return; // prevent multiple mouseover events making extra work
+            this._tableSort.over = index;
             const draggableRow = this._draggableRow;
             const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            const enter = this._tableSort.enter;
+            const over = this._tableSort.over;
             const leave = this._tableSort.leave;
-            if (enter > leave) { // down
+            if (over > leave) { // down
                 rowToMove.style.top = '-' + sum;
-            }
-            if (enter < leave) { // up
+            } else if (over < leave) { // up
                 rowToMove.style.top = sum;
             }
-        }.bind(this, index, rowWrapper));
-
-        rowWrapper.addEventListener('mouseout', function(index, rowWrapper) {
-            if (!this._isDragAllowed) return;
-            rowWrapper.style.opacity = '1';
-            this._tableSort.leave = index;
         }.bind(this, index, rowWrapper));
 
         rowWrapper.appendChild(row);
