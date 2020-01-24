@@ -218,7 +218,6 @@ export default class VffTable extends HTMLElement {
     _makeDraggable(row, index) {
         const rowWrapper = document.createElement('div');
         rowWrapper.setAttribute('class', 'row-wrapper');
-        rowWrapper.setAttribute('index', index);
         const dragButton = new DragButton();
         dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
@@ -230,20 +229,19 @@ export default class VffTable extends HTMLElement {
             rowWrapper.style.zIndex = '-1000';
         }.bind(this, rowWrapper));
 
-        rowWrapper.addEventListener('mouseenter', function(index) {
+        rowWrapper.addEventListener('mouseenter', function(index, rowWrapper) {
             if (!this._isDragAllowed) return;
             this._tableSort.over = index;
             const draggableRow = this._draggableRow;
-            const rowToMove = this.shadowRoot.querySelector("[index='" + index + "']");
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
             const over = this._tableSort.over;
             const drag = this._tableSort.drag;
             if (over > drag) { // down
-                rowToMove.style.top = '-' + sum;
+                rowWrapper.style.top = '-' + sum;
             } else if (over < drag) { // up
-                rowToMove.style.top = sum;
+                rowWrapper.style.top = sum;
             }
         }.bind(this, index, rowWrapper));
 
