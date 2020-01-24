@@ -10,8 +10,6 @@ export default class RowWrapper {
         this._startY = props.startY;
         this._domNode = props.domNode;
         this._topRelativePosition = parseInt(getStyleVal(this._domNode, 'top'));
-        this._domNode.style.opacity = '0.9';
-        this._domNode.visibility = 'hidden';
         this._followTheMouse = this._followTheMouse.bind(this);
         window.addEventListener('mousemove', this._followTheMouse);
     }
@@ -37,7 +35,6 @@ export default class RowWrapper {
     }
 
     reset() {
-        this._domNode.style.opacity = '1';
         window.removeEventListener('mousemove', this._followTheMouse);
     }
 }
