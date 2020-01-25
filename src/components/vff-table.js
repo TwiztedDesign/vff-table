@@ -4,7 +4,17 @@ import VffRow from "./vff-row";
 import DragButton from './vff-drag-button';
 import DraggableRow from '../classes/draggable-row';
 import {getStyleVal} from "../utils/utils";
-// import {createElement} from '../utils/utils';
+
+let oldY = 0;
+let yDirection;
+const updateMouseDirection = function(event) {
+    if (oldY < event.pageY) {
+        yDirection = "down";
+    } else if (oldY > event.pageY) {
+        yDirection = "up";
+    }
+    oldY = event.pageY;
+};
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -14,7 +24,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
-        this._tableSort = {over: null, drag: null, drop: null};
+        this._tableSort = {over: null, drag: null, leave: null};
         this._isDragAllowed = false; // flag
         this._draggableRow = null;
         this.shadowRoot.innerHTML = `
@@ -175,37 +185,33 @@ export default class VffTable extends HTMLElement {
     _onAllowDrag(index, rowWrapper, event) {
         this._isDragAllowed = true;
         this._draggableRow = new DraggableRow({domNode: rowWrapper, startY: event.detail});
+        document.body.addEventListener('mousemove', updateMouseDirection);
     }
 
     /**
      * @param index - of dragged element
      * @private
      */
-    _onPreventDrag(index) {
-        this._tableSort.drop = index;
-        this._draggableRow.reset();
-        this._arrangeDataModel();
-        this._resetTableSort();
+    _onPreventDrag() {
         this._isDragAllowed = false;
+        this._arrangeDataModel();
+        this._draggableRow.reset();
+        this._resetTableSort();
+        document.body.removeEventListener('mousemove', updateMouseDirection);
         this._render();
     }
 
     _resetTableSort() {
         this._tableSort.over = null;
         this._tableSort.drag = null;
-        this._tableSort.drop = null;
     }
 
     _arrangeDataModel() {
-        const from = this._tableSort.drop;
+        const from = this._tableSort.drag;
         const to = this._tableSort.over;
         const tableData = this._tableBody.slice();
         if (from === null || to === null) return;
-        if (from < to) {
-            tableData.splice((to), 0, tableData.splice(from, 1)[0]);
-        } else {
-            tableData.splice(to, 0, tableData.splice(from, 1)[0]);
-        }
+        tableData.splice(to, 0, tableData.splice(from, 1)[0]);
         this._tableBody = tableData;
     }
 
@@ -222,28 +228,33 @@ export default class VffTable extends HTMLElement {
         dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
 
-        rowWrapper.addEventListener('mousedown', function(rowWrapper) {
+        rowWrapper.addEventListener('mousedown', function() {
             if (!this._isDragAllowed) return;
             this._tableSort.drag = index;
             this._tableSort.over = index;
             rowWrapper.style.zIndex = '-1000';
-        }.bind(this, rowWrapper));
+        }.bind(this));
 
-        rowWrapper.addEventListener('mouseenter', function(index, rowWrapper) {
+        /*rowWrapper.addEventListener('mouseout', function() {
+            if (!this._isDragAllowed) return;
+            this._tableSort.leave = index;
+        }.bind(this));*/
+
+        rowWrapper.addEventListener('mouseenter', function() {
             if (!this._isDragAllowed) return;
             this._tableSort.over = index;
             const draggableRow = this._draggableRow;
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            const over = this._tableSort.over;
-            const drag = this._tableSort.drag;
-            if (over > drag) { // down
+            if (rowWrapper.style.top !== '') {
+                rowWrapper.style.top = '';
+            } else if (yDirection === 'down') { // down
                 rowWrapper.style.top = '-' + sum;
-            } else if (over < drag) { // up
+            } else if (yDirection === 'up') { // up
                 rowWrapper.style.top = sum;
             }
-        }.bind(this, index, rowWrapper));
+        }.bind(this));
 
         rowWrapper.appendChild(row);
         rowWrapper.appendChild(dragButton);
