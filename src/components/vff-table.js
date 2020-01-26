@@ -232,7 +232,7 @@ export default class VffTable extends HTMLElement {
         const dragButton = new DragButton();
         dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
-        let isIntransition = false;
+        let isInTransition = false;
 
         rowWrapper.addEventListener('mousedown', function() {
             if (!this._draggableRow) return;
@@ -242,18 +242,18 @@ export default class VffTable extends HTMLElement {
         }.bind(this));
 
         rowWrapper.addEventListener('transitionend', function() {
-            isIntransition = false;
+            isInTransition = false;
         });
 
         rowWrapper.addEventListener('mouseenter', function() {
             if (!this._draggableRow) return;
-            if (isIntransition) return;
+            if (isInTransition) return;
             this._tableSort.over = index;
             const draggableRow = this._draggableRow;
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            isIntransition = true;
+            isInTransition = true;
             if (rowWrapper.style.transform !== '') { // moving back in case of up / down drag
                 if (yDirection === direction.UP) {
                     this._tableSort.over = this._tableSort.over - 1;
