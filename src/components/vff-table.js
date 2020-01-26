@@ -7,6 +7,7 @@ import {getStyleVal} from "../utils/utils";
 
 let oldY = 0;
 let yDirection;
+
 const updateMouseDirection = function(event) {
     if (oldY < event.pageY) {
         yDirection = "down";
@@ -25,7 +26,6 @@ export default class VffTable extends HTMLElement {
         this._tableBody = null;
         this._footer = null;
         this._tableSort = {over: null, drag: null, leave: null};
-        this._isDragAllowed = false; // flag
         this._draggableRow = null;
         this.shadowRoot.innerHTML = `
             <style>
@@ -183,7 +183,6 @@ export default class VffTable extends HTMLElement {
      * @private
      */
     _onAllowDrag(index, rowWrapper, event) {
-        this._isDragAllowed = true;
         this._draggableRow = new DraggableRow({domNode: rowWrapper, startY: event.detail});
         document.body.addEventListener('mousemove', updateMouseDirection);
     }
@@ -193,11 +192,11 @@ export default class VffTable extends HTMLElement {
      * @private
      */
     _onPreventDrag() {
-        this._isDragAllowed = false;
         this._arrangeDataModel();
-        this._draggableRow.reset();
         this._resetTableSort();
         document.body.removeEventListener('mousemove', updateMouseDirection);
+        this._draggableRow.reset();
+        this._draggableRow = null;
         this._render();
     }
 
@@ -229,25 +228,26 @@ export default class VffTable extends HTMLElement {
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
 
         rowWrapper.addEventListener('mousedown', function() {
-            if (!this._isDragAllowed) return;
+            if (!this._draggableRow) return;
             this._tableSort.drag = index;
             this._tableSort.over = index;
             rowWrapper.style.zIndex = '-1000';
         }.bind(this));
 
-        /*rowWrapper.addEventListener('mouseout', function() {
-            if (!this._isDragAllowed) return;
-            this._tableSort.leave = index;
-        }.bind(this));*/
-
         rowWrapper.addEventListener('mouseenter', function() {
-            if (!this._isDragAllowed) return;
+            if (!this._draggableRow) return;
             this._tableSort.over = index;
+            //console.log('mouseenter: ', this._tableSort.over);
             const draggableRow = this._draggableRow;
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            if (rowWrapper.style.top !== '') {
+            if (rowWrapper.style.top !== '') { // moving back in case of up / down drag
+                if (yDirection === 'up') {
+                    this._tableSort.over = this._tableSort.over - 1;
+                } else {
+                    this._tableSort.over = this._tableSort.over + 1;
+                }
                 rowWrapper.style.top = '';
             } else if (yDirection === 'down') { // down
                 rowWrapper.style.top = '-' + sum;
