@@ -5,14 +5,19 @@ import DragButton from './vff-drag-button';
 import DraggableRow from '../classes/draggable-row';
 import {getStyleVal} from "../utils/utils";
 
+const direction = {
+    UP: 'up',
+    DOWN: 'down'
+};
+
 let oldY = 0;
 let yDirection;
 
 const updateMouseDirection = function(event) {
     if (oldY < event.pageY) {
-        yDirection = "down";
+        yDirection = direction.DOWN;
     } else if (oldY > event.pageY) {
-        yDirection = "up";
+        yDirection = direction.UP;
     }
     oldY = event.pageY;
 };
@@ -44,6 +49,8 @@ export default class VffTable extends HTMLElement {
                     background-color: #00cccd;
                 }                         
                 .row-wrapper{         
+                    will-change: transform;
+                    transition: transform .3s;
                     height: 50px;                                                   
                     position: relative;
                 }                                                          
@@ -188,7 +195,6 @@ export default class VffTable extends HTMLElement {
     }
 
     /**
-     * @param index - of dragged element
      * @private
      */
     _onPreventDrag() {
@@ -226,33 +232,39 @@ export default class VffTable extends HTMLElement {
         const dragButton = new DragButton();
         dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
+        let isIntransition = false;
 
         rowWrapper.addEventListener('mousedown', function() {
             if (!this._draggableRow) return;
             this._tableSort.drag = index;
             this._tableSort.over = index;
-            rowWrapper.style.zIndex = '-1000';
+            rowWrapper.style.zIndex = '-100';
         }.bind(this));
+
+        rowWrapper.addEventListener('transitionend', function() {
+            isIntransition = false;
+        });
 
         rowWrapper.addEventListener('mouseenter', function() {
             if (!this._draggableRow) return;
+            if (isIntransition) return;
             this._tableSort.over = index;
-            //console.log('mouseenter: ', this._tableSort.over);
             const draggableRow = this._draggableRow;
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
             const sum = height + margin + 'px';
-            if (rowWrapper.style.top !== '') { // moving back in case of up / down drag
-                if (yDirection === 'up') {
+            isIntransition = true;
+            if (rowWrapper.style.transform !== '') { // moving back in case of up / down drag
+                if (yDirection === direction.UP) {
                     this._tableSort.over = this._tableSort.over - 1;
                 } else {
                     this._tableSort.over = this._tableSort.over + 1;
                 }
-                rowWrapper.style.top = '';
-            } else if (yDirection === 'down') { // down
-                rowWrapper.style.top = '-' + sum;
-            } else if (yDirection === 'up') { // up
-                rowWrapper.style.top = sum;
+                rowWrapper.style.transform = '';
+            } else if (yDirection === direction.DOWN) { // down
+                rowWrapper.style.transform = 'translateY(-' + sum + ')';
+            } else if (yDirection === direction.UP) { // up
+                rowWrapper.style.transform = 'translateY(' + sum + ')';
             }
         }.bind(this));
 
