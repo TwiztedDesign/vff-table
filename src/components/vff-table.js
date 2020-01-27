@@ -50,7 +50,7 @@ export default class VffTable extends HTMLElement {
                 }                         
                 .row-wrapper{         
                     will-change: transform;
-                    transition: transform .3s;
+                    transition: transform 100ms ease-out;
                     height: 50px;                                                   
                     position: relative;
                 }                                                          
@@ -245,14 +245,14 @@ export default class VffTable extends HTMLElement {
             isInTransition = false;
         });
 
-        rowWrapper.addEventListener('mouseenter', function() {
+        rowWrapper.addEventListener('mouseover', function() {
             if (!this._draggableRow) return;
             if (isInTransition) return;
             this._tableSort.over = index;
             const draggableRow = this._draggableRow;
             const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
             const height = parseInt(draggableRow.height);
-            const sum = height + margin + 'px';
+            const distance = height + margin + 'px';
             isInTransition = true;
             if (rowWrapper.style.transform !== '') { // moving back in case of up / down drag
                 if (yDirection === direction.UP) {
@@ -261,10 +261,21 @@ export default class VffTable extends HTMLElement {
                     this._tableSort.over = this._tableSort.over + 1;
                 }
                 rowWrapper.style.transform = '';
-            } else if (yDirection === direction.DOWN) { // down
-                rowWrapper.style.transform = 'translateY(-' + sum + ')';
-            } else if (yDirection === direction.UP) { // up
-                rowWrapper.style.transform = 'translateY(' + sum + ')';
+            } else {
+                const wrappers = this.shadowRoot.querySelectorAll('.row-wrapper'); // todo : this input can come from any place
+                wrappers.forEach((node, index, list) => {
+                    if (index === this._tableSort.drag) return; // don't touch the one that is being dragged
+                    if (yDirection === direction.DOWN) {
+                        // indexes from the element that is being dragged to the one we're over
+                        if (index <= this._tableSort.over && index > this._tableSort.drag) { // translate up all the bigger indexes
+                            list[index].style.transform = 'translateY(-' + distance + ')';
+                        }
+                    } else if (yDirection === direction.UP) { // translate down all the smaller indexes
+                        if (index >= this._tableSort.over && index < this._tableSort.drag) {
+                            list[index].style.transform = 'translateY(' + distance + ')';
+                        }
+                    }
+                });
             }
         }.bind(this));
 
