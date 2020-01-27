@@ -44,14 +44,14 @@ export default class DragButton extends HTMLElement {
     }
 
     _onMouseDown(e) {
-        const event = new CustomEvent('vff-allow-draggable', {detail: e.pageY});
+        const event = new CustomEvent('vff-grab-drag-button', {detail: {startDragAtY: e.pageY}});
         this._mouseDown = true;
         this.dispatchEvent(event);
     }
 
     _onMouseUp() {
         if (!this._mouseDown) return;
-        const event = new Event('vff-prevent-draggable');
+        const event = new Event('vff-release-drag-button');
         this._mouseDown = false;
         this.dispatchEvent(event);
     }

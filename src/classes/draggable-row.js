@@ -3,11 +3,11 @@ import {getStyleVal} from "../utils/utils";
 export default class RowWrapper {
     /**
      * @param props
-     * @param props.domNode
-     * @param props.startY - point where mousedown happened and the element was grabbed
+     * @param {HTMLElement} props.domNode
+     * @param {number} props.startDragAtY - point where mousedown happened and the element was grabbed
      */
     constructor(props) {
-        this._startY = props.startY;
+        this._startDragAtY = props.startDragAtY;
         this._domNode = props.domNode;
         this._topRelativePosition = parseInt(getStyleVal(this._domNode, 'top'));
         this._followTheMouse = this._followTheMouse.bind(this);
@@ -30,7 +30,7 @@ export default class RowWrapper {
      * @private
      */
     _followTheMouse(event) {
-        let newTop = this._topRelativePosition + (event.pageY - this._startY);
+        let newTop = this._topRelativePosition + (event.pageY - this._startDragAtY);
         this._domNode.style.top = newTop + 'px';
     }
 

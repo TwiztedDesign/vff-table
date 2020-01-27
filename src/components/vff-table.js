@@ -189,20 +189,23 @@ export default class VffTable extends HTMLElement {
      * @param event
      * @private
      */
-    _onAllowDrag(index, rowWrapper, event) {
-        this._draggableRow = new DraggableRow({domNode: rowWrapper, startY: event.detail});
+    _onGrabDragButton(index, rowWrapper, event) {
+        this._draggableRow = new DraggableRow({
+            domNode: rowWrapper,
+            startDragAtY: event.detail.startDragAtY
+        });
         document.body.addEventListener('mousemove', updateMouseDirection);
     }
 
     /**
      * @private
      */
-    _onPreventDrag() {
+    _onReleaseDragButton() {
         this._arrangeDataModel();
         this._resetTableSort();
-        document.body.removeEventListener('mousemove', updateMouseDirection);
         this._draggableRow.reset();
         this._draggableRow = null;
+        document.body.removeEventListener('mousemove', updateMouseDirection);
         this._render();
     }
 
@@ -230,8 +233,8 @@ export default class VffTable extends HTMLElement {
         const rowWrapper = document.createElement('div');
         rowWrapper.setAttribute('class', 'row-wrapper');
         const dragButton = new DragButton();
-        dragButton.addEventListener('vff-allow-draggable', this._onAllowDrag.bind(this, index, rowWrapper));
-        dragButton.addEventListener('vff-prevent-draggable', this._onPreventDrag.bind(this, index));
+        dragButton.addEventListener('vff-grab-drag-button', this._onGrabDragButton.bind(this, index, rowWrapper));
+        dragButton.addEventListener('vff-release-drag-button', this._onReleaseDragButton.bind(this, index));
         let isInTransition = false;
 
         rowWrapper.addEventListener('mousedown', function() {
