@@ -11,6 +11,7 @@ export default class RowWrapper {
         this._domNode = props.domNode;
         this._topRelativePosition = parseInt(getStyleVal(this._domNode, 'top'));
         this._followTheMouse = this._followTheMouse.bind(this);
+        this._domNode.style.zIndex = '-100';
         window.addEventListener('mousemove', this._followTheMouse);
     }
 
@@ -35,6 +36,7 @@ export default class RowWrapper {
     }
 
     reset() {
+        this._domNode.style.zIndex = '';
         window.removeEventListener('mousemove', this._followTheMouse);
     }
 }

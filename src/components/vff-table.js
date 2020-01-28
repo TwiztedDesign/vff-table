@@ -241,7 +241,6 @@ export default class VffTable extends HTMLElement {
             if (!this._draggableRow) return;
             this._tableSort.drag = index;
             this._tableSort.over = index;
-            rowWrapper.style.zIndex = '-100';
         }.bind(this));
 
         rowWrapper.addEventListener('transitionend', function() {
