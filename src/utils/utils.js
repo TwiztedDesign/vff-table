@@ -12,22 +12,21 @@ export const getStyleVal = function(elm, css) {
 
 /**
  * @param {string} type - HTML elements types as: link , div etc..
- * @param {string} id
- * @param {array} classNames
- * @param {object} style - style options
+ * @param {object} attributes
  * @return {HTMLElement}
  */
-export const createElement = function(type, id, classNames, style) {
+export const createElement = function(type, attributes = {}) {
     const el = document.createElement(type);
 
-    id && (el.id = id);
+    attributes.id && (el.id = attributes.id);
 
-    classNames && classNames.length && classNames.forEach(function(className) {
+    attributes.classList && attributes.classList.length && attributes.classList.forEach(function(className) {
         el.classList.add(className);
     });
 
-    style && Object.keys(style).forEach(function(property) {
-        el.style[property] = style[property];
+    attributes.style && Object.keys(attributes.style).forEach(function(property) {
+        el.style[property] = attributes.style[property];
     });
+
     return el;
 };
