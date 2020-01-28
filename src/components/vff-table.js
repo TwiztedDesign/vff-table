@@ -3,7 +3,7 @@ import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import DragButton from './vff-drag-button';
 import DraggableRow from '../classes/draggable-row';
-import {getStyleVal} from "../utils/utils";
+import {createElement, getStyleVal} from "../utils/utils";
 
 const direction = {
     UP: 'up',
@@ -30,7 +30,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
-        this._tableSort = {over: null, drag: null, leave: null};
+        this._tableSort = {over: null, drag: null};
         this._draggableRow = null;
         this.shadowRoot.innerHTML = `
             <style>
@@ -230,12 +230,12 @@ export default class VffTable extends HTMLElement {
      * @private
      */
     _makeDraggable(row, index) {
-        const rowWrapper = document.createElement('div');
-        rowWrapper.setAttribute('class', 'row-wrapper');
+        const rowWrapper = createElement('div', {classList: ['row-wrapper']});
         const dragButton = new DragButton();
+        let isInTransition = false;
+
         dragButton.addEventListener('vff-grab-drag-button', this._onGrabDragButton.bind(this, index, rowWrapper));
         dragButton.addEventListener('vff-release-drag-button', this._onReleaseDragButton.bind(this, index));
-        let isInTransition = false;
 
         rowWrapper.addEventListener('mousedown', function() {
             if (!this._draggableRow) return;
@@ -264,7 +264,7 @@ export default class VffTable extends HTMLElement {
                 }
                 rowWrapper.style.transform = '';
             } else {
-                const wrappers = this.shadowRoot.querySelectorAll('.row-wrapper'); // todo : this input can come from any place
+                const wrappers = this.shadowRoot.querySelectorAll('.row-wrapper');
                 wrappers.forEach((node, index, list) => {
                     if (index === this._tableSort.drag) return; // don't touch the one that is being dragged
                     if (yDirection === direction.DOWN) {
@@ -272,7 +272,7 @@ export default class VffTable extends HTMLElement {
                         if (index <= this._tableSort.over && index > this._tableSort.drag) { // translate up all the bigger indexes
                             list[index].style.transform = 'translateY(-' + distance + ')';
                         }
-                    } else if (yDirection === direction.UP) { // translate down all the smaller indexes
+                    } else if (yDirection === direction.UP) {
                         if (index >= this._tableSort.over && index < this._tableSort.drag) {
                             list[index].style.transform = 'translateY(' + distance + ')';
                         }
