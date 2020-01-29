@@ -1,26 +1,7 @@
 import tableData from '../../mocks/table_data';
 import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
-import DragButton from './vff-drag-button';
-import DraggableRow from '../classes/draggable-row';
-import {createElement, getStyleVal} from "../utils/utils";
-
-const direction = {
-    UP: 'up',
-    DOWN: 'down'
-};
-
-let oldY = 0;
-let yDirection;
-
-const updateMouseDirection = function(event) {
-    if (oldY < event.pageY) {
-        yDirection = direction.DOWN;
-    } else if (oldY > event.pageY) {
-        yDirection = direction.UP;
-    }
-    oldY = event.pageY;
-};
+import {makeSortableDecorator} from "../decorators/sortable-table";
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -30,8 +11,7 @@ export default class VffTable extends HTMLElement {
         this._subHeader = null;
         this._tableBody = null;
         this._footer = null;
-        this._tableSort = {over: null, drag: null};
-        this._draggableRow = null;
+        this._onTableBodyChange = this._onTableBodyChange.bind(this);
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -127,10 +107,12 @@ export default class VffTable extends HTMLElement {
         this._subHeader = titles;
         this._tableBody = tableData.body; // array of arrays
         this._footer = 'Footer Content';
+        this.addEventListener('vff-table-body-change', this._onTableBodyChange);
         this._render();
     }
 
     disconnectedCallback() {
+        this.removeEventListener('vff-table-body-change', this._onTableBodyChange);
     }
 
     /*****************************************
@@ -168,13 +150,17 @@ export default class VffTable extends HTMLElement {
     _renderBody() {
         const amountOfRows = this._tableBody && this._tableBody.length;
         if (!amountOfRows) return;
+        let tableRows = [];
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
             const row = new VffRow();
             row.columns = this._tableBody[i];
-            const draggableRow = this._makeDraggable(row, i);
-            fragment.appendChild(draggableRow);
+            tableRows.push(row);
         }
+        tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
+        tableRows.forEach(tr => {
+            fragment.appendChild(tr);
+        });
         return fragment;
     }
 
@@ -183,107 +169,9 @@ export default class VffTable extends HTMLElement {
         return this.footer;
     }
 
-    /**
-     * @param index
-     * @param rowWrapper
-     * @param event
-     * @private
-     */
-    _onGrabDragButton(index, rowWrapper, event) {
-        this._draggableRow = new DraggableRow({
-            domNode: rowWrapper,
-            startDragAtY: event.detail.startDragAtY
-        });
-        document.body.addEventListener('mousemove', updateMouseDirection);
-    }
-
-    /**
-     * @private
-     */
-    _onReleaseDragButton() {
-        this._arrangeDataModel();
-        this._resetTableSort();
-        this._draggableRow.reset();
-        this._draggableRow = null;
-        document.body.removeEventListener('mousemove', updateMouseDirection);
+    _onTableBodyChange(event) {
+        this._tableBody = event.detail.tableState;
         this._render();
-    }
-
-    _resetTableSort() {
-        this._tableSort.over = null;
-        this._tableSort.drag = null;
-    }
-
-    _arrangeDataModel() {
-        const from = this._tableSort.drag;
-        const to = this._tableSort.over;
-        const tableData = this._tableBody.slice();
-        if (from === null || to === null) return;
-        tableData.splice(to, 0, tableData.splice(from, 1)[0]);
-        this._tableBody = tableData;
-    }
-
-    /**
-     * @param row
-     * @param index
-     * @return {HTMLDivElement} - row enabled to be dragged and reordered across the table
-     * @private
-     */
-    _makeDraggable(row, index) {
-        const rowWrapper = createElement('div', {classList: ['row-wrapper']});
-        const dragButton = new DragButton();
-        let isInTransition = false;
-
-        dragButton.addEventListener('vff-grab-drag-button', this._onGrabDragButton.bind(this, index, rowWrapper));
-        dragButton.addEventListener('vff-release-drag-button', this._onReleaseDragButton.bind(this, index));
-
-        rowWrapper.addEventListener('mousedown', function() {
-            if (!this._draggableRow) return;
-            this._tableSort.drag = index;
-            this._tableSort.over = index;
-        }.bind(this));
-
-        rowWrapper.addEventListener('transitionend', function() {
-            isInTransition = false;
-        });
-
-        rowWrapper.addEventListener('mouseover', function() {
-            if (!this._draggableRow) return;
-            if (isInTransition) return;
-            this._tableSort.over = index;
-            const draggableRow = this._draggableRow;
-            const margin = parseInt(getStyleVal(draggableRow._domNode, 'margin-top'));
-            const height = parseInt(draggableRow.height);
-            const distance = height + margin + 'px';
-            isInTransition = true;
-            if (rowWrapper.style.transform !== '') { // moving back in case of up / down drag
-                if (yDirection === direction.UP) {
-                    this._tableSort.over = this._tableSort.over - 1;
-                } else {
-                    this._tableSort.over = this._tableSort.over + 1;
-                }
-                rowWrapper.style.transform = '';
-            } else {
-                const wrappers = this.shadowRoot.querySelectorAll('.row-wrapper');
-                wrappers.forEach((node, index, list) => {
-                    if (index === this._tableSort.drag) return; // don't touch the one that is being dragged
-                    if (yDirection === direction.DOWN) {
-                        // indexes from the element that is being dragged to the one we're over
-                        if (index <= this._tableSort.over && index > this._tableSort.drag) { // translate up all the bigger indexes
-                            list[index].style.transform = 'translateY(-' + distance + ')';
-                        }
-                    } else if (yDirection === direction.UP) {
-                        if (index >= this._tableSort.over && index < this._tableSort.drag) {
-                            list[index].style.transform = 'translateY(' + distance + ')';
-                        }
-                    }
-                });
-            }
-        }.bind(this));
-
-        rowWrapper.appendChild(row);
-        rowWrapper.appendChild(dragButton);
-        return rowWrapper;
     }
 
     /*****************************************
