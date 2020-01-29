@@ -1,6 +1,6 @@
 import {getStyleVal} from "../utils/utils";
 
-export default class RowWrapper {
+export default class DraggableRow {
     /**
      * @param props
      * @param {HTMLElement} props.domNode
