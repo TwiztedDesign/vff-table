@@ -33,11 +33,11 @@ export default class VffCol extends HTMLElement {
     }
 
     connectedCallback() {
-        this._render();
     }
 
-    _render() {
+    render() {
         const col = this.shadowRoot.querySelector('#col');
         col.textContent = this._text;
+        return this;
     }
 }

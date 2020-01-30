@@ -144,7 +144,7 @@ export default class VffTable extends HTMLElement {
         if (!amountOfColumns) return null;
         const row = new VffRow();
         row.columns = this._subHeader;
-        return row;
+        return row.render();
     }
 
     _renderBody() {
@@ -155,7 +155,7 @@ export default class VffTable extends HTMLElement {
         for (let i = 0; i < amountOfRows; i++) {
             const row = new VffRow();
             row.columns = this._tableBody[i];
-            tableRows.push(row);
+            tableRows.push(row.render());
         }
         tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
         tableRows.forEach(tr => {

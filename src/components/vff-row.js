@@ -32,7 +32,6 @@ export default class VffRow extends HTMLElement {
     }
 
     connectedCallback() {
-        this._render();
     }
 
     /**
@@ -58,7 +57,7 @@ export default class VffRow extends HTMLElement {
     }
 
     // Render
-    _render() {
+    render() {
         if (this._columns.length < 1) return;
         const columns = this.shadowRoot.querySelector('#columns');
         for (let i = 0; i < this._columns.length; i++) {
@@ -66,7 +65,9 @@ export default class VffRow extends HTMLElement {
             const col = new VffCol();
             col.type = colData.type;
             col.text = colData.data;
+            col.render();
             columns.appendChild(col);
         }
+        return this;
     }
 }
