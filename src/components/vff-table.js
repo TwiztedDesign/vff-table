@@ -142,7 +142,7 @@ export default class VffTable extends HTMLElement {
     _renderSubHeader() {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
-        return new VffRow({columns: this._subHeader}).render();
+        return new VffRow({columns: this._subHeader, index: 0}).render();
     }
 
     _renderBody() {
@@ -151,7 +151,7 @@ export default class VffTable extends HTMLElement {
         let tableRows = [];
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
-            const row = new VffRow({columns: this._tableBody[i]}).render();
+            const row = new VffRow({columns: this._tableBody[i], index: i}).render();
             tableRows.push(row);
         }
         tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());

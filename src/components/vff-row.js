@@ -2,9 +2,14 @@ import BaseShadowRootComponent from "../classes/base-shadow-root-component";
 import VffCol from "./vff-col";
 
 export default class VffRow extends BaseShadowRootComponent {
+    /**
+     * @param props
+     * @param {number} props.index - to identify place in a table, starts with 0
+     * @param {object[]} props.columns - data for each column in a row
+     */
     constructor(props) {
         super();
-        this._index = null;
+        this._index = props.index;
         this._columns = props.columns;
         this._resizable = true;
         this.shadowRoot.innerHTML = `
@@ -32,26 +37,8 @@ export default class VffRow extends BaseShadowRootComponent {
     `;
     }
 
-    /**
-     * @param {number} num
-     */
-    set index(num) {
-        this._index = num;
-    }
-
     get index() {
         return this._index;
-    }
-
-    /**
-     * @param {array} _columns
-     */
-    set columns(_columns) {
-        this._columns = _columns;
-    }
-
-    get columns() {
-        return this._columns;
     }
 
     // Render
@@ -61,7 +48,9 @@ export default class VffRow extends BaseShadowRootComponent {
         const columnsContainer = this.shadowRoot.querySelector('#columns');
         this._columns.forEach((colData, index) => {
             const col = new VffCol({
-                type: colData.type, text: colData.data, index: index
+                type: colData.type,
+                text: colData.data,
+                index: index
             }).render();
             col.style.width = columnWidth;
             columnsContainer.appendChild(col.render());

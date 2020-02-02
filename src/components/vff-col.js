@@ -1,6 +1,12 @@
 import BaseShadowRootComponent from "../classes/base-shadow-root-component";
 
 export default class VffCol extends BaseShadowRootComponent {
+    /**
+     * @param props
+     * @param {string }props.type - a component can be of type text or image // todo : extend type support
+     * @param {string }props.text - if component is of type text
+     * @param {number} props.index - to identify place in a row, starts with 0
+     */
     constructor(props) {
         super();
         this._type = props.type || 'text';
@@ -32,10 +38,6 @@ export default class VffCol extends BaseShadowRootComponent {
 
     set text(_text) {
         this._text = _text;
-    }
-
-    set index(_index) {
-        this._index = _index;
     }
 
     get index() {
