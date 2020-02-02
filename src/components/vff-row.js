@@ -61,7 +61,7 @@ export default class VffRow extends BaseShadowRootComponent {
                 text: colData.data,
                 index: index
             }).render();
-            col.style.width = columnWidth;
+            col.style.width = colData.width || columnWidth;
             columnsContainer.appendChild(col.render());
         });
         return this;

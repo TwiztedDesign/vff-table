@@ -1,117 +1,154 @@
 {
   "header": "This is a header",
-  "sub_header": "This one is sub-header",
+  "sub_header": [
+    {
+      "data": "Title 1",
+      "width": ""
+    },
+    {
+      "data": "Title 2",
+      "width": ""
+    },
+    {
+      "data": "Title 3",
+      "width": ""
+    }
+  ],
   "body": [
     [
       {
         "data": "Hello",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "first",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is second",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is third",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is forth",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "Hello",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "first",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is second",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is third",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ],
     [
       {
         "data": "This",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "is forth",
-        "type": "text"
+        "type": "text",
+        "width": ""
       },
       {
         "data": "row",
-        "type": "text"
+        "type": "text",
+        "width": ""
       }
     ]
   ],

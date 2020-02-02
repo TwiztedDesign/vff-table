@@ -4,7 +4,7 @@
  */
 import {createElement, getStyleVal, toArray} from "../utils/utils";
 
-export const makeResizerDecorator = function(row) {
+export const makeResizerDecorator = function(table, row) {
     /**
      * 1. get all vff-cols
      * 2. wrap each of them in a wrapper element to allow attaching elements
@@ -12,9 +12,9 @@ export const makeResizerDecorator = function(row) {
      */
     const cols = toArray.call(row.shadowRoot.querySelectorAll('vff-col'));
     if (!cols) return;
-
     const rowDomElement = row.shadowRoot.querySelector('#row');
     const columns = row.shadowRoot.querySelector('#columns');
+    const colWrappersList = [];
 
     cols.forEach((col, index, arr) => {
         const ruler = createElement('div', {
@@ -28,12 +28,9 @@ export const makeResizerDecorator = function(row) {
                 userSelect: 'none',
                 height: '200px',
                 zIndex: 1000
-            },
-            data: {
-                index
             }
         });
-        const colWrapper = createElement('div', {classList: ['col-wrapper']});
+        const colWrapper = createElement('div', {classList: ['col-wrapper'], data: {index}});
         const width = col.style.width;
         colWrapper.appendChild(col);
         if (index !== (arr.length - 1)) { // don't append to last one
@@ -43,6 +40,7 @@ export const makeResizerDecorator = function(row) {
         colWrapper.style.display = 'flex';
         colWrapper.style.flexDirection = 'row';
         colWrapper.style.width = width;
+        colWrappersList.push(colWrapper);
         col.style.width = '100%';
         setListeners(ruler);
         setMutationObserver(colWrapper);
@@ -98,7 +96,13 @@ export const makeResizerDecorator = function(row) {
             }
         });
 
-        document.addEventListener('mouseup', function() {
+        div.addEventListener('mouseup', function() {
+            const widthArr = [];
+            colWrappersList.forEach(colWrapper => {
+                widthArr.push(colWrapper.style.width);
+            });
+            const event = new CustomEvent('vff-column-width-change', {detail: {widthArr}});
+            table.dispatchEvent(event);
             curCol = undefined;
             nxtCol = undefined;
             pageX = undefined;
@@ -146,8 +150,4 @@ export const makeResizerDecorator = function(row) {
     }
 
     return row;
-};
-
-export const makeResizeableDecorator = function(row) {
-    // console.log(row);
 };

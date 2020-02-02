@@ -1,5 +1,4 @@
 import tableData from '../../mocks/table_data';
-import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
 import {makeResizerDecorator, makeResizeableDecorator} from "../decorators/resizable-columns";
@@ -13,6 +12,7 @@ export default class VffTable extends HTMLElement {
         this._tableBody = null;
         this._footer = null;
         this._onTableBodyChange = this._onTableBodyChange.bind(this);
+        this._onColumnWidthChange = this._onColumnWidthChange.bind(this);
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -105,10 +105,11 @@ export default class VffTable extends HTMLElement {
 
     connectedCallback() {
         this._header = 'Header Content';
-        this._subHeader = titles;
+        this._subHeader = tableData.sub_header;
         this._tableBody = tableData.body; // array of arrays
         this._footer = 'Footer Content';
         this.addEventListener('vff-table-body-change', this._onTableBodyChange);
+        this.addEventListener('vff-column-width-change', this._onColumnWidthChange);
         this._render();
     }
 
@@ -145,7 +146,7 @@ export default class VffTable extends HTMLElement {
         if (!amountOfColumns) return null;
         const row = new VffRow({columns: this._subHeader, index: 0});
         // return row.render();
-        return makeResizerDecorator(row.render()); // todo : don't send the original
+        return makeResizerDecorator(this, row.render()); // todo : don't send the original
     }
 
     _renderBody() {
@@ -158,7 +159,6 @@ export default class VffTable extends HTMLElement {
             tableRows.push(row);
         }
         tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
-        tableRows.forEach(tr => makeResizeableDecorator(tr));
         tableRows.forEach(tr => {
             fragment.appendChild(tr);
         });
@@ -172,6 +172,19 @@ export default class VffTable extends HTMLElement {
 
     _onTableBodyChange(event) {
         this._tableBody = event.detail.tableState;
+        this._render();
+    }
+
+    _onColumnWidthChange(event) {
+        const widthArr = event.detail.widthArr;
+        this._subHeader.forEach((col, index) => {
+            col.width = widthArr[index];
+        });
+        this._tableBody.forEach((row) => {
+            row.forEach((col, index) => {
+                col.width = widthArr[index];
+            });
+        });
         this._render();
     }
 
