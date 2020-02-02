@@ -2,6 +2,7 @@ import tableData from '../../mocks/table_data';
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
 import {makeResizerDecorator} from "../decorators/resizable-columns";
+import {createElement} from "../utils/utils";
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -28,7 +29,13 @@ export default class VffTable extends HTMLElement {
                 #table-sub-header {
                     height: 50px;
                     background-color: #00cccd;
-                }                         
+                }            
+                #sub-header--text{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                }             
                 .row-wrapper{         
                     will-change: transform;
                     transition: transform 100ms ease-out;
@@ -105,7 +112,7 @@ export default class VffTable extends HTMLElement {
 
     connectedCallback() {
         this._header = 'Header Content';
-        this._subHeader = tableData.sub_header;
+        this._subHeader = tableData.sub_header && tableData.sub_header.length > 0 ? tableData.sub_header : '';
         this._tableBody = tableData.body; // array of arrays
         this._footer = 'Footer Content';
         this.addEventListener('vff-table-body-change', this._onTableBodyChange);
@@ -143,11 +150,15 @@ export default class VffTable extends HTMLElement {
     }
 
     _renderSubHeader() {
-        const amountOfColumns = this._subHeader && this._subHeader.length;
-        if (!amountOfColumns) return null;
-        const row = new VffRow({columns: this._subHeader, index: 0});
-        return row.render();
-        //return makeResizerDecorator(this, row.render()); // todo : don't send the original
+        if (typeof this._subHeader === 'string') {
+            const subHeader = createElement('h1', {id: 'sub-header--text'});
+            subHeader.innerText = this._subHeader;
+            return subHeader;
+        }
+        if (Array.isArray(this._subHeader)) {
+            const row = new VffRow({columns: this._subHeader, index: 0});
+            return row.render();
+        }
     }
 
     _renderBody() {
