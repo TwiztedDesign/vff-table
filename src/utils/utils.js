@@ -1,13 +1,13 @@
 export const forEach = Array.prototype.forEach;
-
+export const toArray = Array.prototype.slice;
 /**
  * Get Computed style value
- * @param {HTMLElement} elm - DOM node
+ * @param {HTMLElement} el - DOM node
  * @param {string} css - property to evaluate
  * @return {*}
  */
-export const getStyleVal = function(elm, css) {
-    return (window.getComputedStyle(elm, null).getPropertyValue(css));
+export const getStyleVal = function(el, css) {
+    return (window.getComputedStyle(el, null).getPropertyValue(css));
 };
 
 /**
@@ -26,6 +26,10 @@ export const createElement = function(type, attributes = {}) {
 
     attributes.style && Object.keys(attributes.style).forEach(function(property) {
         el.style[property] = attributes.style[property];
+    });
+
+    attributes.data && Object.keys(attributes.data).forEach(function(dataName) {
+        el.dataset[dataName] = attributes.data[dataName];
     });
 
     return el;

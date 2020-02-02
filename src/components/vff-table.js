@@ -2,6 +2,7 @@ import tableData from '../../mocks/table_data';
 import titles from '../../mocks/sub_header';
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
+import {makeResizerDecorator, makeResizeableDecorator} from "../decorators/resizable-columns";
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -142,7 +143,9 @@ export default class VffTable extends HTMLElement {
     _renderSubHeader() {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
-        return new VffRow({columns: this._subHeader, index: 0}).render();
+        const row = new VffRow({columns: this._subHeader, index: 0});
+        // return row.render();
+        return makeResizerDecorator(row.render()); // todo : don't send the original
     }
 
     _renderBody() {
@@ -155,6 +158,7 @@ export default class VffTable extends HTMLElement {
             tableRows.push(row);
         }
         tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
+        tableRows.forEach(tr => makeResizeableDecorator(tr));
         tableRows.forEach(tr => {
             fragment.appendChild(tr);
         });

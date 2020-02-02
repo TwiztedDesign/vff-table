@@ -26,10 +26,19 @@ export default class VffRow extends BaseShadowRootComponent {
                     height: 100%;      
                     display: flex;
                     flex-direction: row;
-                }               
+                }
+                .col-wrapper{
+                    box-sizing: border-box;
+                }
+                .col-wrapper:not(:last-child){
+                    border-right: 1px solid #f0f0f0;
+                }
                 vff-col:not(:last-child){
                     border-right: 1px solid #f0f0f0;
                 } 
+                .col-wrapper vff-col{
+                    border-right: 0
+                }
             </style>
             <div id="row">
                 <div id="columns"></div>               
