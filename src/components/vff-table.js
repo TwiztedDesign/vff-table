@@ -1,7 +1,7 @@
 import tableData from '../../mocks/table_data';
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
-import {makeResizerDecorator, makeResizeableDecorator} from "../decorators/resizable-columns";
+import {makeResizerDecorator} from "../decorators/resizable-columns";
 
 export default class VffTable extends HTMLElement {
     constructor() {
@@ -134,6 +134,7 @@ export default class VffTable extends HTMLElement {
         const footer = this.shadowRoot.querySelector('#table-footer');
         footer.innerHTML = '';
         footer.textContent = this._renderFooter();
+        makeResizerDecorator(this);
     }
 
     _renderHeader() {
@@ -145,8 +146,8 @@ export default class VffTable extends HTMLElement {
         const amountOfColumns = this._subHeader && this._subHeader.length;
         if (!amountOfColumns) return null;
         const row = new VffRow({columns: this._subHeader, index: 0});
-        // return row.render();
-        return makeResizerDecorator(this, row.render()); // todo : don't send the original
+        return row.render();
+        //return makeResizerDecorator(this, row.render()); // todo : don't send the original
     }
 
     _renderBody() {
@@ -155,8 +156,8 @@ export default class VffTable extends HTMLElement {
         let tableRows = [];
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < amountOfRows; i++) {
-            const row = new VffRow({columns: this._tableBody[i], index: i}).render();
-            tableRows.push(row);
+            const row = new VffRow({columns: this._tableBody[i], index: i});
+            tableRows.push(row.render());
         }
         tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
         tableRows.forEach(tr => {

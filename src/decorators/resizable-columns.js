@@ -4,13 +4,20 @@
  */
 import {createElement, getStyleVal, toArray} from "../utils/utils";
 
-export const makeResizerDecorator = function(table, row) {
+export const makeResizerDecorator = function(table) {
     /**
      * 1. get all vff-cols
-     * 2. wrap each of them in a wrapper element to allow attaching elements
+     * 2. calculate height of a tour
+     * 3. wrap each of them in a wrapper element to allow attaching elements
      * 3. rest of the cols should be listening for changes
      */
-    const cols = toArray.call(row.shadowRoot.querySelectorAll('vff-col'));
+    const rows = table.shadowRoot.querySelectorAll('vff-row');
+    const row = rows[0];
+    const rulerHeight = toArray(rows).reduce((total, row) => {
+        const el = row.shadowRoot.querySelector('#row');
+        return total + parseInt(getStyleVal(el, 'height'));
+    }, 0);
+    const cols = toArray(row.shadowRoot.querySelectorAll('vff-col'));
     if (!cols) return;
     const rowDomElement = row.shadowRoot.querySelector('#row');
     const columns = row.shadowRoot.querySelector('#columns');
@@ -26,28 +33,27 @@ export const makeResizerDecorator = function(table, row) {
                 position: 'absolute',
                 cursor: 'col-resize',
                 userSelect: 'none',
-                height: '200px',
+                height: rulerHeight + 'px',
                 zIndex: 1000
             }
         });
-        const colWrapper = createElement('div', {classList: ['col-wrapper'], data: {index}});
+        const colWrapper = createElement('div', {
+            classList: ['col-wrapper'], style: {position: 'relative'}, data: {index}
+        });
         const width = col.style.width;
         colWrapper.appendChild(col);
         if (index !== (arr.length - 1)) { // don't append to last one
             colWrapper.appendChild(ruler);
         }
-        colWrapper.style.position = 'relative';
-        colWrapper.style.display = 'flex';
-        colWrapper.style.flexDirection = 'row';
         colWrapper.style.width = width;
         colWrappersList.push(colWrapper);
         col.style.width = '100%';
-        setListeners(ruler);
+        setControllerListeners(ruler);
         setMutationObserver(colWrapper);
         columns.appendChild(colWrapper);
     });
 
-    function setListeners(div) {
+    function setControllerListeners(div) {
         let pageX,
             curCol,
             nxtCol,
@@ -73,16 +79,16 @@ export const makeResizerDecorator = function(table, row) {
         /**
          * on mouseover we'll make resizer visible
          */
-        div.addEventListener('mouseover', function(e) {
+        /*div.addEventListener('mouseover', function(e) {
             e.target.style.borderRight = '2px solid black';
-        });
+        });*/
 
         /**
          * on mouseout we'll hide the resizer
          */
-        div.addEventListener('mouseout', function(e) {
+        /*div.addEventListener('mouseout', function(e) {
             e.target.style.borderRight = '';
-        });
+        });*/
 
         /**
          * If there is a mousemove event with a mousedown event (we're holding and moving an element)

@@ -1,5 +1,9 @@
-export const forEach = Array.prototype.forEach;
-export const toArray = Array.prototype.slice;
+export const forEach = function(obj) {
+    return Array.prototype.forEach.call(obj, arguments);
+};
+export const toArray = function(obj) {
+    return Array.prototype.slice.call(obj, arguments);
+};
 /**
  * Get Computed style value
  * @param {HTMLElement} el - DOM node
