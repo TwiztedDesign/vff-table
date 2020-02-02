@@ -1,23 +1,25 @@
-export default class VffCol extends HTMLElement {
-    constructor() {
+import BaseShadowRootComponent from "../classes/base-shadow-root-component";
+
+export default class VffCol extends BaseShadowRootComponent {
+    constructor(props) {
         super();
-        this.attachShadow({mode: 'open'});
-        this._type = 'text';
-        this._text = '';
+        this._type = props.type || 'text';
+        this._text = props.text || '';
+        this._index = props.index || null;
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
                     box-sizing: border-box;
                 }
-                :host{
-                    width: 33.333333333333336%;                    
+                :host{                    
                     height: 100%;                   
-                }
+                }               
                 #col{
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     height: 100%;
+                    position: relative;
                 }
             </style>
             <div id="col"></div>
@@ -32,7 +34,12 @@ export default class VffCol extends HTMLElement {
         this._text = _text;
     }
 
-    connectedCallback() {
+    set index(_index) {
+        this._index = _index;
+    }
+
+    get index() {
+        return this._index;
     }
 
     render() {

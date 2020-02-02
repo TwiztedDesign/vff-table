@@ -1,11 +1,12 @@
+import BaseShadowRootComponent from "../classes/base-shadow-root-component";
 import VffCol from "./vff-col";
 
-export default class VffRow extends HTMLElement {
-    constructor() {
+export default class VffRow extends BaseShadowRootComponent {
+    constructor(props) {
         super();
-        this.attachShadow({mode: 'open'});
         this._index = null;
-        this._columns = [];
+        this._columns = props.columns;
+        this._resizable = true;
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
@@ -16,22 +17,19 @@ export default class VffRow extends HTMLElement {
                     width: 100%; 
                     border-bottom: 1px solid #f0f0f0;
                 }
-                #columns{        
+                #columns{
                     height: 100%;      
                     display: flex;
                     flex-direction: row;
-                }
+                }               
                 vff-col:not(:last-child){
                     border-right: 1px solid #f0f0f0;
-                }       
+                } 
             </style>
             <div id="row">
                 <div id="columns"></div>               
             </div>
     `;
-    }
-
-    connectedCallback() {
     }
 
     /**
@@ -59,15 +57,15 @@ export default class VffRow extends HTMLElement {
     // Render
     render() {
         if (this._columns.length < 1) return;
-        const columns = this.shadowRoot.querySelector('#columns');
-        for (let i = 0; i < this._columns.length; i++) {
-            const colData = this._columns[i];
-            const col = new VffCol();
-            col.type = colData.type;
-            col.text = colData.data;
-            col.render();
-            columns.appendChild(col);
-        }
+        const columnWidth = 100 / this._columns.length + '%';  // default setting
+        const columnsContainer = this.shadowRoot.querySelector('#columns');
+        this._columns.forEach((colData, index) => {
+            const col = new VffCol({
+                type: colData.type, text: colData.data, index: index
+            }).render();
+            col.style.width = columnWidth;
+            columnsContainer.appendChild(col.render());
+        });
         return this;
     }
 }
