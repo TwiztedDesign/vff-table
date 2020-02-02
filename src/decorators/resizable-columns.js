@@ -11,9 +11,9 @@ export const makeResizerDecorator = function(table) {
      * 3. wrap each of them in a wrapper element to allow attaching elements
      * 3. rest of the cols should be listening for changes
      */
-    const rows = table.shadowRoot.querySelectorAll('vff-row');
+    const rows = toArray(table.shadowRoot.querySelectorAll('vff-row'));
     const row = rows[0];
-    const rulerHeight = toArray(rows).reduce((total, row) => {
+    const rulerHeight = rows.reduce((total, row) => {
         const el = row.shadowRoot.querySelector('#row');
         return total + parseInt(getStyleVal(el, 'height'));
     }, 0);
@@ -53,13 +53,35 @@ export const makeResizerDecorator = function(table) {
         columns.appendChild(colWrapper);
     });
 
-    function setControllerListeners(div) {
-        let pageX,
-            curCol,
-            nxtCol,
-            curColWidth,
-            nxtColWidth;
+    let pageX,
+        curColWidth,
+        nxtColWidth,
+        curCol; // todo: revisit this crap
 
+    const resizableRows = [...rows];
+    resizableRows.splice(0, 1);
+    resizableRows.forEach(row => {
+        const cols = toArray(row.shadowRoot.querySelectorAll('vff-col'));
+        cols.forEach(col => {
+            setMutationObserver(col);
+            setResizableRowsListeners(col);
+        });
+    });
+
+    function setResizableRowsListeners(col) {
+        const nxtCol = col.nextElementSibling;
+
+        document.addEventListener('mousemove', function(e) {
+            if (curCol && parseInt(curCol.dataset.index) === col.index) {
+                const diffX = e.pageX - pageX;
+                if (nxtCol) nxtCol.style.width = (nxtColWidth - (diffX)) + 'px';
+                col.style.width = (curColWidth + diffX) + 'px';
+            }
+        });
+    }
+
+    function setControllerListeners(div) {
+        let nxtCol;
         /**
          * on mousedown we'll be continuously calculating the widths of the current and next sibling element
          */

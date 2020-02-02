@@ -11,7 +11,7 @@ export default class VffCol extends BaseShadowRootComponent {
         super();
         this._type = props.type || 'text';
         this._text = props.text || '';
-        this._index = props.index || null;
+        this._index = props.index;
         this.shadowRoot.innerHTML = `
             <style>
                 :host(*) {
