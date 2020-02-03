@@ -1,4 +1,5 @@
-import tableData from '../../mocks/table_data';
+import {cloneDeep} from 'lodash';
+import localTableData from '../../mocks/table_data';
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
 import {makeResizerDecorator} from "../decorators/resizable-columns";
@@ -111,6 +112,7 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     connectedCallback() {
+        const tableData = cloneDeep(localTableData);
         this._header = 'Header Content';
         this._subHeader = tableData.sub_header && tableData.sub_header.length > 0 ? tableData.sub_header : '';
         this._tableBody = Array.isArray(tableData.body) && tableData.body.length > 0 ? tableData.body : []; // array of arrays
