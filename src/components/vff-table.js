@@ -28,8 +28,7 @@ export default class VffTable extends HTMLElement {
                     background-color: #00cccd29;
                 }
                                          
-                #table-sub-header {
-                    height: 50px;
+                #table-sub-header {                    
                     background-color: #00cccd;
                 }            
                 #sub-header--text{
@@ -40,14 +39,12 @@ export default class VffTable extends HTMLElement {
                 }             
                 .row-wrapper{         
                     will-change: transform;
-                    transition: transform 100ms ease-out;
-                    height: 50px;                                                   
+                    transition: transform 100ms ease-out;                                                                     
                     position: relative;
                 }                                                          
                 vff-drag-button{
                     opacity: 0.1;     
-                    height: 100%;  
-                    width: 50px;                                              
+                    height: 100%;                                                                
                     position: absolute;
                     top: 0;
                     right: 0;

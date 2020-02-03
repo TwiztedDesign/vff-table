@@ -11,7 +11,7 @@ export default class DragButton extends HTMLElement {
                     background-color: black;
                     display: block;
                     height: 100%;                   
-                    width: 100%;     
+                    width: 50px;     
                 }
                 :host(*) {
                     box-sizing: border-box;
