@@ -71,7 +71,7 @@ export const makeResizerDecorator = function(table) {
     function setResizableRowsListeners(col) {
         const nxtCol = col.nextElementSibling;
 
-        document.addEventListener('mousemove', function(e) {
+        table.addEventListener('mousemove', function(e) {
             if (curCol && parseInt(curCol.dataset.index) === col.index) {
                 const diffX = e.pageX - pageX;
                 if (nxtCol) nxtCol.style.width = (nxtColWidth - (diffX)) + 'px';
@@ -116,7 +116,7 @@ export const makeResizerDecorator = function(table) {
          * If there is a mousemove event with a mousedown event (we're holding and moving an element)
          * update width on elements on resize
          */
-        document.addEventListener('mousemove', function(e) {
+        table.addEventListener('mousemove', function(e) {
             if (curCol) {
                 const diffX = e.pageX - pageX;
                 if (nxtCol) nxtCol.style.width = (nxtColWidth - (diffX)) + 'px';
