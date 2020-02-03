@@ -1,6 +1,6 @@
 import DragButton from "../components/vff-drag-button";
 import DraggableRow from '../classes/draggable-row';
-import {createElement, getStyleVal} from "../utils/utils";
+import {createElement, getStyleVal, toArray} from "../utils/utils";
 
 const direction = {
     UP: 'up',
@@ -33,14 +33,10 @@ class Sortable {
         this._deocratedRows = [];
         this._tableSort = {over: null, drag: null};
         this._draggableRow = null;
-        this._rows.forEach((row, index) => {
-            this._deocratedRows.push(
-                this._makeDraggable(row, index)
-            );
-        });
+        this._rows.forEach((row, index) => this._makeDraggable(row, index));
     }
 
-    get sortableRows(){
+    get sortableRows() {
         return this._deocratedRows;
     }
 
@@ -142,20 +138,20 @@ class Sortable {
                 });
             }
         }.bind(this));
-
+        const parent = row.parentElement;
+        parent.appendChild(rowWrapper);
         rowWrapper.appendChild(row);
         rowWrapper.appendChild(dragButton);
-        return rowWrapper;
     }
 }
 
 /**
  * @param tableRef
- * @param tableBodyState
- * @param tableRows
  * @return {[]|*[]}
  */
-export const makeSortableDecorator = function(tableRef, tableBodyState, tableRows) {
-    const sortable = new Sortable({tableRef, tableBodyState, tableRows});
-    return sortable.sortableRows;
+export const makeSortableDecorator = function(tableRef) {
+    const tableBody = tableRef.shadowRoot.querySelector('#table-body');
+    const tableRows = toArray(tableBody.querySelectorAll('vff-row'));
+    const tableBodyState = tableRef._tableBody.slice();
+    new Sortable({tableRef, tableBodyState, tableRows});
 };

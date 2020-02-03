@@ -113,7 +113,7 @@ export default class VffTable extends HTMLElement {
     connectedCallback() {
         this._header = 'Header Content';
         this._subHeader = tableData.sub_header && tableData.sub_header.length > 0 ? tableData.sub_header : '';
-        this._tableBody = tableData.body; // array of arrays
+        this._tableBody = Array.isArray(tableData.body) && tableData.body.length > 0 ? tableData.body : []; // array of arrays
         this._footer = 'Footer Content';
         this.addEventListener('vff-table-body-change', this._onTableBodyChange);
         this.addEventListener('vff-column-width-change', this._onColumnWidthChange);
@@ -141,6 +141,9 @@ export default class VffTable extends HTMLElement {
         const footer = this.shadowRoot.querySelector('#table-footer');
         footer.innerHTML = '';
         footer.textContent = this._renderFooter();
+
+        // Decorate the table
+        makeSortableDecorator(this);
         makeResizerDecorator(this);
     }
 
@@ -162,17 +165,10 @@ export default class VffTable extends HTMLElement {
     }
 
     _renderBody() {
-        const amountOfRows = this._tableBody && this._tableBody.length;
-        if (!amountOfRows) return;
-        let tableRows = [];
         const fragment = document.createDocumentFragment();
-        for (let i = 0; i < amountOfRows; i++) {
-            const row = new VffRow({columns: this._tableBody[i], index: i});
-            tableRows.push(row.render());
-        }
-        tableRows = makeSortableDecorator(this, this._tableBody.slice(), tableRows.slice());
-        tableRows.forEach(tr => {
-            fragment.appendChild(tr);
+        this._tableBody.forEach((rowData, index) => {
+            const row = new VffRow({columns: rowData, index});
+            fragment.appendChild(row.render());
         });
         return fragment;
     }
