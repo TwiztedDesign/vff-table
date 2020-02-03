@@ -4,6 +4,46 @@ export const forEach = function(obj) {
 export const toArray = function(obj) {
     return Array.prototype.slice.call(obj, arguments);
 };
+
+/**
+ * @param {string} url
+ * @return {Promise<Response>}
+ * @private
+ */
+export const _fetch = function(url) {
+    /**
+     * @param response
+     * @return {*}
+     * @private
+     */
+    function _checkStatus(response) {
+        if (response.ok) {
+            return Promise.resolve(response)
+        } else {
+            return Promise.reject(new Error(response.statusText));
+        }
+    }
+
+    /**
+     * @param response
+     * @return {any | Promise<any>}
+     * @private
+     */
+    function _parseJson(response) {
+        return response.json();
+    }
+
+    return fetch(url)
+        .then(_checkStatus)
+        .then(_parseJson)
+        .then(function(data) {
+            return data;
+        })
+        .catch(function(error) {
+            throw error;
+        });
+};
+
 /**
  * Get Computed style value
  * @param {HTMLElement} el - DOM node
