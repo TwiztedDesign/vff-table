@@ -13,19 +13,16 @@ export default class VffCol extends BaseShadowRootComponent {
         this._text = props.text || '';
         this._index = props.index;
         this.shadowRoot.innerHTML = `
-            <style>
+            <style>           
                 :host(*) {
                     box-sizing: border-box;
                 }
-                :host{                    
-                    height: 100%;                   
-                }               
-                #col{
+                :host{                                       
+                    height: 100%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    height: 100%;
-                    position: relative;
+                    position: relative;                   
                 }
             </style>
             <div id="col"></div>

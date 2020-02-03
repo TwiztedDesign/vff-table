@@ -14,12 +14,17 @@ export default class VffRow extends BaseShadowRootComponent {
         this._resizable = true;
         this.shadowRoot.innerHTML = `
             <style>
+                :host {
+                    display: block;
+                    height: 100%;     
+                    width: 100%;
+                }
                 :host(*) {
                     box-sizing: border-box;
                 }              
                 #row{              
-                    height: 100%;     
                     width: 100%; 
+                    height: 100%;     
                     border-bottom: 1px solid #f0f0f0;
                 }
                 #columns{

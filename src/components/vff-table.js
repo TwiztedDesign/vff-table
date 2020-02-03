@@ -15,6 +15,9 @@ export default class VffTable extends HTMLElement {
         this._onColumnWidthChange = this._onColumnWidthChange.bind(this);
         this.shadowRoot.innerHTML = `
             <style>
+                :host {
+                    display: block
+                }
                 :host(*) {
                     box-sizing: border-box;                                
                 }

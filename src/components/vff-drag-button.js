@@ -6,14 +6,15 @@ export default class DragButton extends HTMLElement {
         this.attachShadow({mode: 'open'});
         this.shadowRoot.innerHTML = `
             <style>
+                :host {
+                    cursor: move;                                      
+                    background-color: black;
+                    display: block;
+                    height: 100%;                   
+                    width: 100%;     
+                }
                 :host(*) {
                     box-sizing: border-box;
-                }
-                #drag-button {                   
-                    cursor: move;
-                    height: 100%;
-                    width: 100%;
-                    background-color: black;
                 }
             </style>
             <div id="drag-button"></div>
