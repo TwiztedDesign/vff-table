@@ -101,16 +101,16 @@ export const makeResizerDecorator = function(table) {
         /**
          * on mouseover we'll make resizer visible
          */
-        /*div.addEventListener('mouseover', function(e) {
-            e.target.style.borderRight = '2px solid black';
-        });*/
+        div.addEventListener('mouseover', function(e) {
+            e.target.style.borderRight = '2px solid #37689a';
+        });
 
         /**
          * on mouseout we'll hide the resizer
          */
-        /*div.addEventListener('mouseout', function(e) {
+        div.addEventListener('mouseout', function(e) {
             e.target.style.borderRight = '';
-        });*/
+        });
 
         /**
          * If there is a mousemove event with a mousedown event (we're holding and moving an element)
