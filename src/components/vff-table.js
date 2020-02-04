@@ -110,7 +110,7 @@ export default class VffTable extends HTMLElement {
      *****************************************/
 
     connectedCallback() {
-        _fetch('../../mocks/table_data.json').then(tableData => {
+        _fetch('../../mocks/table_data_3_columns.json').then(tableData => {
             this._header = 'Header Content';
             this._subHeader = tableData.sub_header && tableData.sub_header.length > 0 ? tableData.sub_header : '';
             this._tableBody = Array.isArray(tableData.body) && tableData.body.length > 0 ? tableData.body : []; // array of arrays

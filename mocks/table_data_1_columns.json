@@ -1,0 +1,40 @@
+{
+  "header": "This is a header",
+  "sub_header": [
+    {
+      "data": "Title 1",
+      "width": ""
+    }
+  ],
+  "body": [
+    [
+      {
+        "data": "one",
+        "type": "text",
+        "width": ""
+      }
+    ],
+    [
+      {
+        "data": "two",
+        "type": "text",
+        "width": ""
+      }
+    ],
+    [
+      {
+        "data": "three",
+        "type": "text",
+        "width": ""
+      }
+    ],
+    [
+      {
+        "data": "four",
+        "type": "text",
+        "width": ""
+      }
+    ]
+  ],
+  "footer": "Some footer text"
+}
