@@ -3,6 +3,11 @@ import {makeSortableDecorator} from "../decorators/sortable-table";
 import {makeResizerDecorator} from "../decorators/resizable-columns";
 import {createElement, _fetch} from "../utils/utils";
 
+const mode = {
+    EDIT: 'edit',
+    STAGE: 'stage'
+};
+
 export default class VffTable extends HTMLElement {
     constructor() {
         super();
@@ -62,6 +67,18 @@ export default class VffTable extends HTMLElement {
     /*****************************************
      * Get / Set
      *****************************************/
+    static get observedAttributes() {
+        return ['mode'];
+    }
+
+    set mode(val) {
+        this._mode = val;
+        this._render();
+    }
+
+    get mode() {
+        return this._mode;
+    }
 
     get header() {
         return this._header || '';
@@ -123,6 +140,12 @@ export default class VffTable extends HTMLElement {
 
     disconnectedCallback() {
         this.removeEventListener('vff-table-body-change', this._onTableBodyChange);
+        this.removeEventListener('vff-column-width-change', this._onColumnWidthChange);
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (name === 'mode') this.mode = newValue;
     }
 
     /*****************************************
@@ -143,9 +166,10 @@ export default class VffTable extends HTMLElement {
         footer.innerHTML = '';
         footer.textContent = this._renderFooter();
 
-        // Decorate the table
-        makeSortableDecorator(this);
-        makeResizerDecorator(this);
+        if (this.mode === mode.EDIT) {
+            makeSortableDecorator(this);
+            makeResizerDecorator(this);
+        }
     }
 
     _renderHeader() {
@@ -178,6 +202,10 @@ export default class VffTable extends HTMLElement {
         if (!this._footer) return null;
         return this.footer;
     }
+
+    /*****************************************
+     * Table Data change handlers
+     *****************************************/
 
     _onTableBodyChange(event) {
         this._tableBody = event.detail.tableState;
