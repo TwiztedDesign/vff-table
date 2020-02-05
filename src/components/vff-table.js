@@ -1,6 +1,7 @@
 import VffRow from "./vff-row";
 import {makeSortableDecorator} from "../decorators/sortable-table";
 import {makeResizerDecorator} from "../decorators/resizable-columns";
+import {makeResizableRowsDecorator} from "../decorators/resizable-rows";
 import {createElement, _fetch} from "../utils/utils";
 
 const mode = {
@@ -12,6 +13,7 @@ export default class VffTable extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
+        this._mode = mode.EDIT;
         this._header = null;
         this._subHeader = null;
         this._tableBody = null;
@@ -43,7 +45,6 @@ export default class VffTable extends HTMLElement {
                     height: 100%;
                 }             
                 .row-wrapper{         
-                    will-change: transform;
                     transition: transform 100ms ease-out;                                                                     
                     position: relative;
                 }                                                          
@@ -169,6 +170,7 @@ export default class VffTable extends HTMLElement {
         if (this.mode === mode.EDIT) {
             makeSortableDecorator(this);
             makeResizerDecorator(this);
+            makeResizableRowsDecorator(this);
         }
     }
 

@@ -17,7 +17,7 @@ export default class VffCol extends BaseShadowRootComponent {
                 :host(*) {
                     box-sizing: border-box;
                 }
-                :host{                                       
+                :host{           
                     height: 100%;
                     display: flex;
                     justify-content: center;
